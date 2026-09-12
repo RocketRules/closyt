@@ -3,7 +3,7 @@
  *
  * No model involved — this is plain pixel maths. We decode the garment photo,
  * throw away what looks like background, average what remains, and snap the
- * result to one of the ten palette names the recommender already scores on.
+ * result to the nearest name in the palette the recommender scores on.
  *
  * Keeping the output inside SWATCH matters: colourScore() in recommend.js
  * checks membership of NEUTRALS and FAMILY by exact name, so an invented
@@ -22,7 +22,7 @@ function hexToRgb(hex) {
  *
  * Worth the ~20 lines: distances in Lab track how different two colours
  * actually look, which RGB and HSL both get badly wrong across this palette
- * (Oatmeal, Cream and Camel are far apart to the eye but close in RGB).
+ * (Beige, Cream and Brown are far apart to the eye but close in RGB).
  */
 function srgbToLinear(c) {
   const v = c / 255;
@@ -53,20 +53,12 @@ const PALETTE = Object.entries(SWATCH).map(([name, hex]) => {
   return { name, ...rgbToLab(r, g, b) };
 });
 
-/*
- * Lightness counts for less than hue when matching to a palette this small.
- * The palette has no true navy, so an unweighted match sends dark navy to
- * Black — which then scores as a neutral in recommend.js and loses the fact
- * that the garment is blue. Discounting L keeps it on Indigo instead.
- */
-const L_WEIGHT = 0.6;
-
 export function nearestPaletteName(r, g, b) {
   const px = rgbToLab(r, g, b);
   let best = PALETTE[0];
   let bestD = Infinity;
   for (const swatch of PALETTE) {
-    const dL = (px.L - swatch.L) * L_WEIGHT;
+    const dL = px.L - swatch.L;
     const da = px.a - swatch.a;
     const db = px.bb - swatch.bb;
     const d = dL * dL + da * da + db * db;
@@ -132,7 +124,7 @@ export function dominantColour(pixels, width, height) {
     }
   }
 
-  if (!considered) return { r: 201, g: 182, b: 148, name: 'Oatmeal' };
+  if (!considered) return { r: 142, g: 142, b: 142, name: 'Grey' };
 
   let modal = -1;
   let modalWeight = -1;

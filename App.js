@@ -19,7 +19,7 @@ import AddItemSheet from './src/screens/AddItemSheet';
 import TabBar from './src/components/TabBar';
 import { Screen } from './src/components/ui';
 import { recommendOutfits, wardrobeStats } from './src/logic/recommend';
-import { preloadClassifier } from './src/logic/classifier';
+import { taggerReady } from './src/logic/tagger';
 import * as store from './src/storage/store';
 import { C } from './src/theme/theme';
 
@@ -45,11 +45,13 @@ export default function App() {
   const [detail, setDetail] = useState(null);
   const [adding, setAdding] = useState(false);
   const [addedThisSession, setAddedThisSession] = useState(0);
+  const [taggerUp, setTaggerUp] = useState(false);
 
   /* Restore the closet on launch; returning users skip straight past onboarding. */
   useEffect(() => {
-    /* Warm the classifier now so the first garment photo is not the slow one. */
-    preloadClassifier();
+    /* Warm the tagger connection so the first photo is not the slow one, and
+     * remember whether it answered so the capture screen can say so. */
+    taggerReady().then(setTaggerUp);
     (async () => {
       const [saved, wardrobe, counts] = await Promise.all([
         store.getBodyProfile(),
@@ -173,6 +175,7 @@ export default function App() {
         <View style={StyleSheet.absoluteFill}>
           <AddItemSheet
             addedThisSession={addedThisSession}
+            taggerUp={taggerUp}
             onClose={() => setAdding(false)}
             onAdded={(item) => {
               const withId = { ...item, id: String(Date.now()) };

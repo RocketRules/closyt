@@ -41,22 +41,32 @@ export const F = {
   mono: 'DMMono_400Regular',
 };
 
-/* Flat-lay swatch colours, used until a real photo exists for an item. */
+/*
+ * Garment colours, in the words people actually use for clothes.
+ * Used for the flat-lay swatch until a real photo exists, and as the
+ * vocabulary the colour detector and the recommender both speak.
+ */
 export const SWATCH = {
-  Oatmeal: '#C9B694',
-  Indigo: '#5A6E8E',
-  Rust: '#B06A42',
-  Olive: '#7E805A',
-  Cream: '#D9CDB6',
-  Charcoal: '#5A534B',
-  Denim: '#6E8CA8',
-  Camel: '#BE9165',
-  Black: '#4A443E',
-  White: '#DED9CE',
+  Black: '#1C1C1C',
+  Grey: '#8E8E8E',
+  White: '#F5F3EE',
+  Cream: '#E8DFCC',
+  Beige: '#C9B694',
+  Brown: '#6B4A33',
+  Navy: '#26334D',
+  Blue: '#3F6FA8',
+  Green: '#4C6B4A',
+  Olive: '#79805C',
+  Red: '#A93226',
+  Burgundy: '#6D2A35',
+  Orange: '#C4703A',
+  Yellow: '#D9B95C',
+  Pink: '#D890A6',
+  Purple: '#6B4C8A',
 };
 
 export const TYPES = ['Shirt', 'Tee', 'Knitwear', 'Jacket', 'Trousers', 'Jeans', 'Shoes'];
 export const COLORS = Object.keys(SWATCH);
 export const FITS = ['Slim', 'Regular', 'Relaxed', 'Straight'];
 
-export const swatchFor = (name) => SWATCH[name] || SWATCH.Oatmeal;
+export const swatchFor = (name) => SWATCH[name] || SWATCH.Grey;

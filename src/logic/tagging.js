@@ -1,24 +1,27 @@
 /*
  * Garment tagging.
  *
- * Decodes the photo once, then reads two things from it:
- *  - colour, by pixel maths against the app's ten-colour palette (colour.js)
- *  - category, from an on-device TensorFlow.js model (classifier.js)
+ * One resize of the photo feeds two readers:
+ *  - colour, from pixel maths on this device (colour.js) — no network needed,
+ *    and more accurate for colour than asking a vision model
+ *  - category and fit, from FashionCLIP running in server/ (tagger.js)
  *
- * Fit stays manual. A category-labelled dataset cannot supervise it, and
- * guessing it would be worse than the one tap it costs in the tag editor.
+ * FashionCLIP is zero-shot, so the label set lives in the server's prompts and
+ * nothing here needs retraining when it changes.
  *
- * Anything that fails here degrades rather than throws: the caller always gets
- * a usable item, flagged `needsReview` so the editor opens on it.
+ * Nothing in here throws. If the server is unreachable the item still comes
+ * back with its colour filled in, flagged `needsReview` so the editor opens.
  */
 
 import { loadPixels } from './imaging';
 import { dominantColour } from './colour';
-import { classify } from './classifier';
-import { TYPES } from '../theme/theme';
+import { tagImage } from './tagger';
+import { TYPES, FITS } from '../theme/theme';
 
-/* Display names read better than the bare category. */
-const DISPLAY = {
+/* Below this the model is guessing, so send the user to the editor. */
+const CONFIDENCE_FLOOR = 0.45;
+
+const CAT_DISPLAY = {
   Shirt: 'Shirt',
   Tee: 'Cotton tee',
   Knitwear: 'Knit',
@@ -31,7 +34,7 @@ const DISPLAY = {
 const FALLBACK = {
   type: 'New item',
   cat: 'Shirt',
-  colorName: 'Oatmeal',
+  colorName: 'Grey',
   fit: 'Regular',
 };
 
@@ -42,7 +45,7 @@ export async function tagGarment(photoUri) {
   try {
     pixels = await loadPixels(photoUri);
   } catch {
-    /* Could not even decode the photo — hand back the blank item to edit. */
+    /* Could not even decode the photo — hand back a blank item to edit. */
     return item;
   }
 
@@ -53,15 +56,23 @@ export async function tagGarment(photoUri) {
   }
 
   try {
-    const guess = await classify(pixels.data, pixels.width, pixels.height);
-    if (guess && TYPES.includes(guess.label)) {
-      item.cat = guess.label;
-      item.type = DISPLAY[guess.label] ?? guess.label;
-      /* Only skip the review prompt when the model is actually sure. */
-      item.needsReview = !guess.confident;
+    const result = await tagImage(pixels.base64);
+
+    /* Guard the vocabulary: the server owns the prompts, so treat anything
+     * outside the app's own lists as a mismatch rather than storing it. */
+    const category = result?.category;
+    if (category && TYPES.includes(category.label)) {
+      item.cat = category.label;
+      item.type = CAT_DISPLAY[category.label] ?? category.label;
+      item.needsReview = category.confidence < CONFIDENCE_FLOOR;
+    }
+
+    const fit = result?.fit;
+    if (fit && FITS.includes(fit.label) && fit.confidence >= CONFIDENCE_FLOOR) {
+      item.fit = fit.label;
     }
   } catch {
-    /* No model bundled yet, or inference failed — manual category it is. */
+    /* Server down or slow — colour-only, category by hand. */
   }
 
   return item;

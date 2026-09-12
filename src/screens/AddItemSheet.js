@@ -8,7 +8,7 @@ import FlipButton from '../components/FlipButton';
 import { tagGarment } from '../logic/tagging';
 import { C, F } from '../theme/theme';
 
-export default function AddItemSheet({ addedThisSession, onClose, onAdded }) {
+export default function AddItemSheet({ addedThisSession, taggerUp, onClose, onAdded }) {
   const [busy, setBusy] = useState(false);
   const [facing, setFacing] = useState('back');
   const [permission, requestPermission] = useCameraPermissions();
@@ -50,9 +50,11 @@ export default function AddItemSheet({ addedThisSession, onClose, onAdded }) {
         <Mono size={10.5} color={busy ? C.ember : C.dim}>
           {busy
             ? 'reading the garment…'
-            : addedThisSession
-              ? `${addedThisSession} added this session`
-              : 'new item'}
+            : !taggerUp
+              ? 'tagger offline · colour only'
+              : addedThisSession
+                ? `${addedThisSession} added this session`
+                : 'new item'}
         </Mono>
         <View style={{ width: 38 }} />
       </View>

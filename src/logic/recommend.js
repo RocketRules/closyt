@@ -17,12 +17,13 @@ const ROLE = {
   Shoes: 'shoes',
 };
 
-const NEUTRALS = ['Oatmeal', 'Cream', 'Charcoal', 'Black', 'White', 'Camel'];
+const NEUTRALS = ['Black', 'Grey', 'White', 'Cream', 'Beige', 'Brown', 'Navy'];
 const FAMILY = {
-  Oatmeal: 'warm', Cream: 'warm', Camel: 'warm', Rust: 'warm',
-  Olive: 'earth',
-  Indigo: 'cool', Denim: 'cool',
-  Charcoal: 'mono', Black: 'mono', White: 'mono',
+  Red: 'warm', Burgundy: 'warm', Orange: 'warm', Yellow: 'warm', Pink: 'warm',
+  Brown: 'warm', Beige: 'warm', Cream: 'warm',
+  Blue: 'cool', Navy: 'cool', Purple: 'cool',
+  Green: 'earth', Olive: 'earth',
+  Black: 'mono', Grey: 'mono', White: 'mono',
 };
 
 export const roleOf = (item) => ROLE[item.cat] || 'top';
