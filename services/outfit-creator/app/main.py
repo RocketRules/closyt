@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 
 from app.ranking import RankingError, rank_outfits
 from app.schemas import RankRequest, RankResponse
+from app.suggestions import suggest_pieces
 
 load_dotenv()
 
@@ -62,6 +63,20 @@ def post_rank_outfits(request: RankRequest) -> RankResponse:
     try:
         return rank_outfits(request)
     except RankingError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.post("/suggest_pieces")
+def post_suggest_pieces(request: RankRequest) -> dict:
+    """Analyze wardrobe gaps and suggest new pieces to buy."""
+    if not _api_key_configured():
+        raise HTTPException(
+            status_code=503,
+            detail="IFM_API_KEY is missing. Configure it before calling /suggest_pieces.",
+        )
+    try:
+        return suggest_pieces(request)
+    except Exception as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 

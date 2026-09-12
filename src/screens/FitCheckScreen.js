@@ -1,24 +1,42 @@
 import React, { useState, useRef } from 'react';
-import { View, ScrollView, Pressable, Text, Image, StyleSheet, Animated, Easing } from 'react-native';
+import { View, ScrollView, Pressable, Text, Image, StyleSheet, Animated, Easing, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Display, Mono, Body, GhostButton, Card } from '../components/ui';
-import FlipButton from '../components/FlipButton';
 import { scoreFit } from '../logic/fitcheck';
 import { C, F } from '../theme/theme';
 
+const isWeb = Platform.OS === 'web';
+
+let CameraView = null;
+let useCameraPermissions = () => [{ granted: false }, () => {}];
+let FlipButton = () => null;
+if (!isWeb) {
+  try {
+    const cam = require('expo-camera');
+    CameraView = cam.CameraView;
+    useCameraPermissions = cam.useCameraPermissions;
+    FlipButton = require('../components/FlipButton').default;
+  } catch {}
+}
+
 export default function FitCheckScreen({ profile }) {
-  const [stage, setStage] = useState('idle'); // idle | camera | scanning | done
+  const [stage, setStage] = useState('idle');
   const [result, setResult] = useState(null);
   const [photo, setPhoto] = useState(null);
-  /* A mirror selfie is the natural way to shoot your own outfit. */
   const [facing, setFacing] = useState('front');
   const [permission, requestPermission] = useCameraPermissions();
   const camera = useRef(null);
   const insets = useSafeAreaInsets();
 
+  const cameraAvailable = !isWeb && permission?.granted && CameraView;
+
   const begin = async () => {
+    if (isWeb) {
+      pickFromLibrary();
+      return;
+    }
     if (!permission?.granted) {
       const res = await requestPermission();
       if (!res?.granted) return;
@@ -26,18 +44,29 @@ export default function FitCheckScreen({ profile }) {
     setStage('camera');
   };
 
+  const handlePhoto = (uri) => {
+    setPhoto(uri);
+    setStage('scanning');
+    setTimeout(() => {
+      setResult(scoreFit(uri, profile));
+      setStage('done');
+    }, 1300);
+  };
+
   const shoot = async () => {
     if (!camera.current) return;
     try {
       const shot = await camera.current.takePictureAsync({ quality: 0.6, skipProcessing: true });
-      setPhoto(shot.uri);
-      setStage('scanning');
-      setTimeout(() => {
-        setResult(scoreFit(shot.uri, profile));
-        setStage('done');
-      }, 1300);
+      handlePhoto(shot.uri);
     } catch {
       setStage('idle');
+    }
+  };
+
+  const pickFromLibrary = async () => {
+    const res = await ImagePicker.launchImageLibraryAsync({ quality: 0.6 });
+    if (!res.canceled && res.assets?.length) {
+      handlePhoto(res.assets[0].uri);
     }
   };
 
@@ -51,7 +80,7 @@ export default function FitCheckScreen({ profile }) {
       {stage === 'idle' && (
         <View style={styles.center}>
           <Body size={15} style={{ textAlign: 'center', maxWidth: 250 }}>
-            Wearing something right now? Let us see it.
+            {isWeb ? 'Upload a fit pic to score it.' : 'Wearing something right now? Let us see it.'}
           </Body>
           <Pressable onPress={begin} style={({ pressed }) => [styles.snapWrap, pressed && { opacity: 0.85 }]}>
             <LinearGradient
@@ -60,16 +89,18 @@ export default function FitCheckScreen({ profile }) {
               end={{ x: 0.9, y: 1 }}
               style={styles.snap}
             >
-              <Text style={styles.snapLabel}>Snap it</Text>
+              <Text style={styles.snapLabel}>{isWeb ? 'Upload' : 'Snap it'}</Text>
             </LinearGradient>
           </Pressable>
-          <Mono size={10.5} color={C.faint}>one tap · no filters</Mono>
+          <Mono size={10.5} color={C.faint}>{isWeb ? 'one photo · instant score' : 'one tap · no filters'}</Mono>
         </View>
       )}
 
-      {stage === 'camera' && (
+      {stage === 'camera' && !isWeb && (
         <View style={styles.cameraWrap}>
-          <CameraView ref={camera} facing={facing} style={StyleSheet.absoluteFill} />
+          {cameraAvailable && (
+            <CameraView ref={camera} facing={facing} style={StyleSheet.absoluteFill} />
+          )}
           <View style={styles.shootRow}>
             <View style={{ width: 48 }} />
             <Pressable
@@ -77,7 +108,7 @@ export default function FitCheckScreen({ profile }) {
               style={({ pressed }) => [styles.shutter, { backgroundColor: pressed ? C.mahHi : C.mah }]}
             />
             <View style={{ width: 48, alignItems: 'flex-end' }}>
-              <FlipButton onPress={() => setFacing((f) => (f === 'back' ? 'front' : 'back'))} />
+              {FlipButton && <FlipButton onPress={() => setFacing((f) => (f === 'back' ? 'front' : 'back'))} />}
             </View>
           </View>
         </View>
@@ -135,7 +166,6 @@ export default function FitCheckScreen({ profile }) {
   );
 }
 
-/* The ring from the design, spinning. */
 function Spinner() {
   const spin = useRef(new Animated.Value(0)).current;
   React.useEffect(() => {

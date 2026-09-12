@@ -114,12 +114,27 @@ export function constraintsFor(presentation, bodyType) {
 /**
  * Build an internal body profile from onboarding data.
  * Never returns body-type labels to the UI — they stay internal only.
+ *
+ * If vision signals are provided (from Gemini selfie analysis), they can
+ * override the BMI-based body type (e.g., average → athletic when muscle
+ * definition is visible).
  */
-export function mergeBodyProfile({ gender, age, height, weight, hUnit, wUnit }) {
+export function mergeBodyProfile({ gender, age, height, weight, hUnit, wUnit }, vision) {
   const heightCm = hUnit === 'ft/in' ? height : height;
   const weightKg = wUnit === 'lb' ? weight / 2.2046 : weight;
   const bmi = calcBmi(weightKg, heightCm);
-  const bodyType = bodyTypeFromBmi(bmi);
+  let bodyType = bodyTypeFromBmi(bmi);
+
+  /* Vision override: if selfie shows visible torso with athletic build,
+     upgrade average/broad → athletic (matches srianeesh-bodyprofile logic). */
+  if (
+    vision &&
+    vision.visibleTorso &&
+    vision.athleticCue === 'high' &&
+    (bodyType === 'average' || bodyType === 'broad')
+  ) {
+    bodyType = 'athletic';
+  }
 
   const presentation =
     gender === 'Woman' ? 'womens' : gender === 'Man' ? 'mens' : 'unisex';
@@ -138,5 +153,6 @@ export function mergeBodyProfile({ gender, age, height, weight, hUnit, wUnit }) 
     fitBias: style.fitBias,
     prefer: style.prefer,
     avoid: style.avoid,
+    vision: vision || null,
   };
 }

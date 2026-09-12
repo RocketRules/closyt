@@ -21,8 +21,9 @@ import { Screen } from './src/components/ui';
 import { recommendOutfits, wardrobeStats } from './src/logic/recommend';
 import { taggerReady } from './src/logic/tagger';
 import { mergeBodyProfile } from './src/logic/bodyProfile';
+import { analyzeSelfie } from './src/logic/analyzeSelfie';
 import { buildRankRequest } from './src/logic/mapToFitEngine';
-import { rankOutfits } from './src/logic/fitEngineClient';
+import { rankOutfits, suggestPieces } from './src/logic/fitEngineClient';
 import * as store from './src/storage/store';
 import { C } from './src/theme/theme';
 
@@ -67,6 +68,7 @@ export default function App() {
   const [engineStatus, setEngineStatus] = useState('idle');
   const [engineError, setEngineError] = useState(null);
   const [engineOutfits, setEngineOutfits] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
   const rankTimer = useRef(null);
 
   useEffect(() => {
@@ -117,6 +119,8 @@ export default function App() {
         const mapped = mapEngineOutfits(resp, items);
         setEngineOutfits(mapped);
         setEngineStatus('ok');
+        /* Also fetch wardrobe gap suggestions (non-blocking). */
+        suggestPieces(req).then(setSuggestions).catch(() => {});
       } catch (err) {
         console.warn('Fit engine error:', err.message);
         setEngineError(err.message);
@@ -131,8 +135,17 @@ export default function App() {
   const outfits = engineStatus === 'ok' && engineOutfits.length ? engineOutfits : localOutfits;
   const stats = useMemo(() => wardrobeStats(items, outfits), [items, outfits]);
 
-  const finishOnboarding = (photos) => {
-    const merged = mergeBodyProfile(profileDraft);
+  const finishOnboarding = async (photos) => {
+    /* Analyze the best selfie (first photo with a face, or the first one). */
+    let vision = null;
+    if (photos && photos.length) {
+      try {
+        vision = await analyzeSelfie(photos[0]);
+      } catch (e) {
+        console.warn('Selfie analysis skipped:', e.message);
+      }
+    }
+    const merged = mergeBodyProfile(profileDraft, vision);
     const next = { ...profileDraft, ...merged, photos };
     setProfile(next);
     store.saveBodyProfile(next);
@@ -196,6 +209,7 @@ export default function App() {
           profile={profile}
           engineStatus={engineStatus}
           engineError={engineError}
+          suggestions={suggestions}
           onSkipOutfit={() => {
             setOutfitIndex((i) => i + 1);
             setWorn(false);
@@ -255,6 +269,7 @@ function MainApp({
   profile,
   engineStatus,
   engineError,
+  suggestions,
   onSkipOutfit,
   onWearOutfit,
   onAdd,
@@ -272,6 +287,7 @@ function MainApp({
             stats={stats}
             engineStatus={engineStatus}
             engineError={engineError}
+            suggestions={suggestions}
             onSkip={onSkipOutfit}
             onWear={onWearOutfit}
             onAdd={onAdd}

@@ -30,14 +30,29 @@ export function mapBody(profile) {
     : profile.fitBias === 'relaxed' ? 'looser'
     : 'looser';
 
+  /* Derive sleeve/color preference from vision signals when available. */
+  const vision = profile.vision;
+  let sleevePref = 'long';
+  let colorPref = 'darker';
+
+  if (vision && vision.clothingVibe) {
+    const vibe = vision.clothingVibe.toLowerCase();
+    if (vibe.includes('light') || vibe.includes('pastel') || vibe.includes('bright')) {
+      colorPref = 'lighter';
+    }
+    if (vibe.includes('short') || vibe.includes('summer') || vibe.includes('casual')) {
+      sleevePref = 'short';
+    }
+  }
+
   return {
     height_cm: profile.heightCm || profile.height || 170,
     weight_kg: profile.weightKg || profile.weight || 70,
     age: profile.age || 25,
     gender,
     fit_preference: fitPref,
-    sleeve_preference: 'long',
-    color_preference: 'darker',
+    sleeve_preference: sleevePref,
+    color_preference: colorPref,
   };
 }
 

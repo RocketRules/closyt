@@ -1,16 +1,22 @@
 import React from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Display, Mono, Body, PrimaryButton, GhostButton } from '../components/ui';
 import ItemThumb from '../components/ItemThumb';
-import { C } from '../theme/theme';
+import { C, F } from '../theme/theme';
 
-export default function TodayScreen({ outfits, index, worn, onSkip, onWear, onAdd, stats, engineStatus, engineError }) {
+const PRIORITY_COLOR = { high: '#BC9670', medium: C.dim, low: C.faint };
+
+export default function TodayScreen({ outfits, index, worn, onSkip, onWear, onAdd, stats, engineStatus, engineError, suggestions }) {
   const insets = useSafeAreaInsets();
   const outfit = outfits.length ? outfits[index % outfits.length] : null;
 
   return (
-    <View style={{ flex: 1, paddingTop: insets.top + 14, paddingHorizontal: 22 }}>
+    <ScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={{ paddingTop: insets.top + 14, paddingHorizontal: 22, paddingBottom: 30 }}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.header}>
         <Display size={30}>Today</Display>
         <Mono size={10.5}>
@@ -65,9 +71,9 @@ export default function TodayScreen({ outfits, index, worn, onSkip, onWear, onAd
           />
         </View>
       ) : (
-        <View style={styles.body}>
-          <View>
-            {/* Stacked cards behind, hinting at the other combinations queued up. */}
+        <>
+          {/* Outfit card */}
+          <View style={{ marginTop: 12 }}>
             <View style={[styles.stack, { top: 18, left: 12, right: 12, bottom: -14, backgroundColor: '#20150E' }]} />
             <View style={[styles.stack, { top: 9, left: 6, right: 6, bottom: -7, backgroundColor: '#241810' }]} />
             <View style={styles.card}>
@@ -90,6 +96,7 @@ export default function TodayScreen({ outfits, index, worn, onSkip, onWear, onAd
               </Body>
             </View>
           </View>
+
           <View style={styles.actions}>
             <GhostButton label="Not today" onPress={onSkip} style={{ flex: 1 }} />
             <PrimaryButton
@@ -99,15 +106,41 @@ export default function TodayScreen({ outfits, index, worn, onSkip, onWear, onAd
               style={{ flex: 1.4 }}
             />
           </View>
-        </View>
+
+          {/* Optimize Closet — wardrobe gap suggestions */}
+          {suggestions && suggestions.length > 0 && (
+            <View style={styles.suggestSection}>
+              <View style={styles.suggestHeader}>
+                <Display size={20}>Optimize your closet</Display>
+                <Mono size={10.5} color={C.ember}>AI suggestions</Mono>
+              </View>
+              {suggestions.map((s, i) => (
+                <View key={i} style={styles.suggestCard}>
+                  <View style={styles.suggestTop}>
+                    <View style={[styles.badge, { backgroundColor: PRIORITY_COLOR[s.priority] || C.dim }]}>
+                      <Text style={styles.badgeText}>{(s.priority || 'med').toUpperCase()}</Text>
+                    </View>
+                    <Text style={styles.suggestCat}>{s.category}</Text>
+                  </View>
+                  <Body size={14.5} color={C.textWarm} style={{ marginBottom: 4 }}>
+                    {s.description}
+                  </Body>
+                  <Body size={12.5} color={C.dim}>
+                    {s.reason}
+                  </Body>
+                </View>
+              ))}
+            </View>
+          )}
+        </>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
-  empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingBottom: 40 },
+  empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingTop: 120, paddingBottom: 40 },
   placeholderGrid: { flexDirection: 'row', flexWrap: 'wrap', width: 120, gap: 8, marginBottom: 6 },
   placeholder: {
     width: 56,
@@ -117,7 +150,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(240,225,210,.1)',
   },
-  body: { flex: 1, justifyContent: 'center', paddingBottom: 16 },
   stack: { position: 'absolute', borderRadius: 26 },
   card: {
     backgroundColor: C.card,
@@ -135,4 +167,23 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   tile: { width: '47.6%', aspectRatio: 1, borderWidth: 1, borderColor: 'rgba(240,225,210,.07)' },
   actions: { flexDirection: 'row', gap: 10, marginTop: 32 },
+  suggestSection: { marginTop: 36 },
+  suggestHeader: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 },
+  suggestCard: {
+    backgroundColor: C.cardAlt,
+    borderWidth: 1,
+    borderColor: 'rgba(188,150,112,.18)',
+    borderRadius: 18,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    marginBottom: 10,
+  },
+  suggestTop: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  badgeText: { fontFamily: F.mono, fontSize: 9, color: '#1B120C', letterSpacing: 0.5 },
+  suggestCat: { fontFamily: F.mono, fontSize: 10.5, color: C.faint, textTransform: 'uppercase', letterSpacing: 0.8 },
 });
