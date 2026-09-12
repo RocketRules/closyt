@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"><style>body{margin:0;background:url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22420%22%20height%3D%22900%22%3E%3Cfilter%20id%3D%22w%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.62%200.006%22%20numOctaves%3D%225%22%20seed%3D%2211%22%2F%3E%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200.07%200%200%200%200%200.04%200%200%200%200%200.02%200%200%200%200.7%20-0.12%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22420%22%20height%3D%22900%22%20filter%3D%22url(%23w)%22%2F%3E%3C%2Fsvg%3E'),linear-gradient(180deg,#160F0A 0%,#0E0906 100%);background-attachment:fixed}a{color:#BC9670}a:hover{color:#CFAE87}*{box-sizing:border-box}::-webkit-scrollbar{width:0;height:0}@keyframes cyRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}@keyframes cySpin{to{transform:rotate(360deg)}}</style></helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:20px;padding:36px 24px 56px;font-family:'DM Sans',system-ui,sans-serif">
+
+  <div style="display:flex;align-items:baseline;gap:12px">
+    <div style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;color:#F0E1D2;letter-spacing:-.01em">Closyt</div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:#9A8370;letter-spacing:.06em;text-transform:uppercase">wear what you own</div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:540px">
+    <sc-for list="{{ jumps }}" as="j" hint-placeholder-count="8">
+      <button onClick="{{ j.go }}" style="border:1px solid {{ j.border }};background:{{ j.bg }};color:{{ j.fg }};font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;padding:7px 11px;border-radius:999px;cursor:pointer" style-hover="border-color:#946E4A">{{ j.label }}</button>
+    </sc-for>
+  </div>
+
+  <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+    <div style="height:100%;display:flex;flex-direction:column;background:url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22420%22%20height%3D%22900%22%3E%3Cfilter%20id%3D%22w%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.62%200.006%22%20numOctaves%3D%225%22%20seed%3D%2211%22%2F%3E%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200.07%200%200%200%200%200.04%200%200%200%200%200.02%200%200%200%200.7%20-0.12%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22420%22%20height%3D%22900%22%20filter%3D%22url(%23w)%22%2F%3E%3C%2Fsvg%3E'),linear-gradient(180deg,#20150E 0%,#1B120C 100%);color:#F0E1D2;font-family:'DM Sans',system-ui,sans-serif;position:relative;overflow:hidden">
+
+      <sc-if value="{{ isWelcome }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;display:grid;grid-template-rows:1fr auto;padding:0 28px 48px;background:url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22420%22%20height%3D%22900%22%3E%3Cfilter%20id%3D%22w%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.62%200.006%22%20numOctaves%3D%225%22%20seed%3D%2211%22%2F%3E%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200.07%200%200%200%200%200.04%200%200%200%200%200.02%200%200%200%200.7%20-0.12%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22420%22%20height%3D%22900%22%20filter%3D%22url(%23w)%22%2F%3E%3C%2Fsvg%3E'),radial-gradient(120% 70% at 50% 38%,#2E2013 0%,#150D08 78%)">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center">
+            <div style="width:104px;height:104px;border-radius:34px;background:linear-gradient(150deg,#7E5C3C 0%,#4E3820 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 18px 40px rgba(0,0,0,.5)">
+              <div style="font-family:'Instrument Serif',serif;font-size:52px;color:#F4E7D9;line-height:1">C</div>
+            </div>
+            <div>
+              <div style="font-family:'Instrument Serif',Georgia,serif;font-size:42px;letter-spacing:-.01em;color:#F4E7D9;line-height:1">Closyt</div>
+              <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#9A8370;margin-top:10px">wear what you own</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column">
+            <button onClick="{{ start }}" style="height:56px;border:none;border-radius:18px;background:#7E5C3C;color:#F7EEDF;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer" style-hover="background:#946E4A">Get started</button>
+            <div style="text-align:center;font-size:13px;color:#8E7965;margin-top:16px">Takes about a minute</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isBasics }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;display:flex;flex-direction:column;padding:68px 24px 40px">
+          <div style="display:flex;gap:6px;margin-bottom:26px">
+            <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+              <div style="flex:1;height:4px;border-radius:99px;background:{{ s.bg }}"></div>
+            </sc-for>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#BC9670;margin-bottom:10px">{{ basicsKicker }}</div>
+          <div style="font-family:'Instrument Serif',Georgia,serif;font-size:32px;line-height:1.1;margin-bottom:24px;color:#F4E7D9">{{ basicsTitle }}</div>
+
+          <sc-if value="{{ isBasics1 }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ genderOpts }}" as="g" hint-placeholder-count="4">
+                <button onClick="{{ g.pick }}" style="text-align:left;height:56px;padding:0 20px;border-radius:16px;border:1.5px solid {{ g.border }};background:{{ g.bg }};color:#F0E1D2;font-family:'DM Sans',sans-serif;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between" style-hover="border-color:#946E4A">
+                  <span>{{ g.label }}</span>
+                  <span style="width:11px;height:11px;border-radius:99px;background:{{ g.dot }}"></span>
+                </button>
+              </sc-for>
+            </div>
+            <div style="margin-top:24px;background:#271A12;border:1px solid rgba(240,225,210,.09);border-radius:18px;padding:16px 20px 12px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
+                <div style="font-size:14px;color:#AC9683">Age</div>
+                <div style="font-family:'Instrument Serif',serif;font-size:28px;color:#F4E7D9">{{ age }}</div>
+              </div>
+              <input type="range" min="16" max="75" value="{{ age }}" onChange="{{ setAge }}" style="width:100%;colorScheme:dark;accentColor:#946E4A;height:22px">
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isBasics2 }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="background:#271A12;border:1px solid rgba(240,225,210,.09);border-radius:18px;padding:16px 20px 12px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:10px">
+                  <div style="font-size:14px;color:#AC9683">Height</div>
+                  <div style="display:flex;gap:4px;padding:3px;border-radius:99px;background:#1E140D">
+                    <sc-for list="{{ heightUnits }}" as="u" hint-placeholder-count="2">
+                      <button onClick="{{ u.pick }}" style="border:none;cursor:pointer;border-radius:99px;padding:5px 12px;background:{{ u.bg }};color:{{ u.fg }};font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase">{{ u.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="font-family:'Instrument Serif',serif;font-size:26px;color:#F4E7D9;margin-bottom:2px">{{ heightLabel }}</div>
+                <input type="range" min="140" max="205" value="{{ height }}" onChange="{{ setHeight }}" style="width:100%;colorScheme:dark;accentColor:#946E4A;height:22px">
+              </div>
+              <div style="background:#271A12;border:1px solid rgba(240,225,210,.09);border-radius:18px;padding:16px 20px 12px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:10px">
+                  <div style="font-size:14px;color:#AC9683">Weight</div>
+                  <div style="display:flex;gap:4px;padding:3px;border-radius:99px;background:#1E140D">
+                    <sc-for list="{{ weightUnits }}" as="u" hint-placeholder-count="2">
+                      <button onClick="{{ u.pick }}" style="border:none;cursor:pointer;border-radius:99px;padding:5px 12px;background:{{ u.bg }};color:{{ u.fg }};font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase">{{ u.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="font-family:'Instrument Serif',serif;font-size:26px;color:#F4E7D9;margin-bottom:2px">{{ weightLabel }}</div>
+                <input type="range" min="40" max="140" value="{{ weight }}" onChange="{{ setWeight }}" style="width:100%;colorScheme:dark;accentColor:#946E4A;height:22px">
+              </div>
+              <div style="font-size:13px;color:#8E7965;line-height:1.45">Used only to judge fit and proportion. Never shared.</div>
+            </div>
+          </sc-if>
+
+          <div style="flex:1"></div>
+          <button onClick="{{ nextBasics }}" style="height:54px;border:none;border-radius:17px;background:#7E5C3C;color:#F7EADD;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer" style-hover="background:#946E4A">Continue</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCapture }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;display:flex;flex-direction:column;background:url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22420%22%20height%3D%22900%22%3E%3Cfilter%20id%3D%22w%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.62%200.006%22%20numOctaves%3D%225%22%20seed%3D%2211%22%2F%3E%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200.07%200%200%200%200%200.04%200%200%200%200%200.02%200%200%200%200.7%20-0.12%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22420%22%20height%3D%22900%22%20filter%3D%22url(%23w)%22%2F%3E%3C%2Fsvg%3E'),linear-gradient(180deg,#150E08 0%,#0D0805 100%);color:#F0E1D2;padding:68px 24px 34px">
+          <div style="display:flex;gap:8px;justify-content:center;margin-bottom:18px">
+            <sc-for list="{{ shotDots }}" as="d" hint-placeholder-count="3">
+              <div style="width:30px;height:4px;border-radius:99px;background:{{ d.bg }}"></div>
+            </sc-for>
+          </div>
+          <div style="text-align:center;font-family:'Instrument Serif',Georgia,serif;font-size:27px;margin-bottom:4px;color:#F4E7D9">{{ shotTitle }}</div>
+          <div style="text-align:center;font-size:13.5px;color:#9A8370;margin-bottom:20px">{{ shotHint }}</div>
+          <div style="flex:1;border-radius:28px;border:1.5px dashed rgba(240,225,210,.22);background:rgba(240,225,210,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;overflow:hidden">
+            <div style="width:110px;height:196px;border-radius:56px 56px 22px 22px;background:repeating-linear-gradient(45deg,rgba(240,225,210,.1) 0 7px,transparent 7px 14px);border:1px solid rgba(240,225,210,.16)"></div>
+            <div style="font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.08em;color:#8E7965;text-transform:uppercase">{{ shotSlot }}</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:26px;margin-top:24px">
+            <div style="width:48px"></div>
+            <button onClick="{{ capture }}" style="width:76px;height:76px;border-radius:99px;border:4px solid rgba(240,225,210,.8);background:#7E5C3C;cursor:pointer" style-hover="background:#946E4A"></button>
+            <button onClick="{{ skipShot }}" style="width:48px;background:none;border:none;color:#9A8370;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">Skip</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isReady }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 34px 40px;gap:14px">
+          <div style="width:68px;height:68px;border-radius:99px;background:#33221A;border:1px solid rgba(188,150,112,.35);display:flex;align-items:center;justify-content:center;font-size:28px;color:#BC9670">✓</div>
+          <div style="font-family:'Instrument Serif',Georgia,serif;font-size:32px;line-height:1.1;color:#F4E7D9">Body profile ready</div>
+          <div style="font-size:15px;color:#AC9683;line-height:1.5;max-width:264px">We'll use it to judge drape, length and proportion on every outfit.</div>
+          <button onClick="{{ enterApp }}" style="margin-top:12px;height:54px;padding:0 34px;border:none;border-radius:17px;background:#7E5C3C;color:#F7EADD;font-size:16px;font-family:'DM Sans',sans-serif;cursor:pointer" style-hover="background:#946E4A">Open Closyt</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+
+          <sc-if value="{{ isRecs }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:62px 22px 0">
+              <div style="display:flex;align-items:baseline;justify-content:space-between">
+                <div style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;color:#F4E7D9">Today</div>
+                <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:#9A8370;text-transform:uppercase;letter-spacing:.06em">{{ weatherLine }}</div>
+              </div>
+
+              <sc-if value="{{ recsEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding-bottom:40px">
+                  <div style="display:grid;grid-template-columns:repeat(2,56px);gap:8px;margin-bottom:6px">
+                    <div style="height:56px;border-radius:14px;background:repeating-linear-gradient(45deg,rgba(240,225,210,.07) 0 6px,transparent 6px 12px);border:1px solid rgba(240,225,210,.1)"></div>
+                    <div style="height:56px;border-radius:14px;background:repeating-linear-gradient(45deg,rgba(240,225,210,.07) 0 6px,transparent 6px 12px);border:1px solid rgba(240,225,210,.1)"></div>
+                    <div style="height:56px;border-radius:14px;background:repeating-linear-gradient(45deg,rgba(240,225,210,.07) 0 6px,transparent 6px 12px);border:1px solid rgba(240,225,210,.1)"></div>
+                    <div style="height:56px;border-radius:14px;background:repeating-linear-gradient(45deg,rgba(240,225,210,.07) 0 6px,transparent 6px 12px);border:1px solid rgba(240,225,210,.1)"></div>
+                  </div>
+                  <div style="font-family:'Instrument Serif',Georgia,serif;font-size:26px;line-height:1.15;max-width:250px;color:#F4E7D9">Nothing to style yet</div>
+                  <div style="font-size:14.5px;color:#AC9683;line-height:1.5;max-width:250px">Snap four or five pieces and Closyt starts pairing them for you.</div>
+                  <button onClick="{{ goAdd }}" style="margin-top:10px;height:58px;padding:0 28px;border:none;border-radius:18px;background:#7E5C3C;color:#F7EADD;font-size:16px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;box-shadow:0 12px 28px rgba(0,0,0,.45)" style-hover="background:#946E4A">Add items to your Closet</button>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ hasRecs }}" hint-placeholder-val="{{ false }}">
+                <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-bottom:16px">
+                  <div style="position:relative">
+                    <div style="position:absolute;inset:18px 12px -14px 12px;border-radius:26px;background:#20150E"></div>
+                    <div style="position:absolute;inset:9px 6px -7px 6px;border-radius:26px;background:#241810"></div>
+                    <div style="position:relative;background:#271A12;border:1px solid rgba(240,225,210,.09);border-radius:26px;padding:20px;box-shadow:0 14px 34px rgba(0,0,0,.45);animation:cyRise .28s ease">
+                      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px">
+                        <div style="font-family:'Instrument Serif',Georgia,serif;font-size:24px;color:#F4E7D9">{{ outfitName }}</div>
+                        <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:#BC9670;letter-spacing:.06em">{{ outfitMatch }}</div>
+                      </div>
+                      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                        <sc-for list="{{ outfitItems }}" as="it" hint-placeholder-count="4">
+                          <div style="border-radius:16px;background:{{ it.color }};aspect-ratio:1;position:relative;overflow:hidden;border:1px solid rgba(240,225,210,.07)">
+                            <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.16) 0 7px,transparent 7px 14px)"></div>
+                            <div style="position:absolute;left:10px;bottom:9px;font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:rgba(20,12,8,.78)">{{ it.name }}</div>
+                          </div>
+                        </sc-for>
+                      </div>
+                      <div style="margin-top:14px;font-size:13.5px;color:#AC9683;line-height:1.45;text-wrap:pretty">{{ outfitWhy }}</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:10px;margin-top:32px">
+                    <button onClick="{{ skipOutfit }}" style="flex:1;height:54px;border-radius:17px;border:1.5px solid rgba(240,225,210,.18);background:none;color:#AC9683;font-family:'DM Sans',sans-serif;font-size:15px;cursor:pointer" style-hover="border-color:rgba(240,225,210,.42)">Not today</button>
+                    <button onClick="{{ wearOutfit }}" style="flex:1.4;height:54px;border-radius:17px;border:none;background:{{ wearBg }};color:#F7EADD;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer">{{ wearLabel }}</button>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isCloset }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+              <div style="padding:62px 22px 12px;display:flex;align-items:baseline;justify-content:space-between">
+                <div style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;color:#F4E7D9">Closet</div>
+                <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:#9A8370;text-transform:uppercase;letter-spacing:.06em">{{ itemCountLabel }}</div>
+              </div>
+              <div style="flex:1;min-height:0;overflow:auto;padding:4px 22px 18px">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <button onClick="{{ goAdd }}" style="aspect-ratio:.84;border-radius:20px;border:1.5px dashed rgba(188,150,112,.5);background:#271E14;color:#BC9670;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-family:'DM Sans',sans-serif" style-hover="background:#31261A">
+                    <span style="font-size:32px;line-height:1;font-weight:300">+</span>
+                    <span style="font-size:13.5px">Add item</span>
+                  </button>
+                  <sc-for list="{{ items }}" as="it" hint-placeholder-count="5">
+                    <button onClick="{{ it.open }}" style="padding:0;border:1px solid rgba(240,225,210,.09);background:#271A12;border-radius:20px;overflow:hidden;cursor:pointer;text-align:left;display:flex;flex-direction:column" style-hover="border-color:rgba(240,225,210,.3)">
+                      <div style="aspect-ratio:1.12;background:{{ it.color }};position:relative;overflow:hidden">
+                        <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.16) 0 7px,transparent 7px 14px)"></div>
+                        <sc-if value="{{ it.needsReview }}" hint-placeholder-val="{{ false }}">
+                          <div style="position:absolute;top:8px;right:8px;background:#271E14;color:#CFAE87;font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.06em;padding:4px 9px;border-radius:99px;text-transform:uppercase;white-space:nowrap">check tags</div>
+                        </sc-if>
+                      </div>
+                      <div style="padding:10px 12px 12px">
+                        <div style="font-size:14px;font-weight:500;line-height:1.2;color:#F0E1D2">{{ it.type }}</div>
+                        <div style="font-family:'DM Mono',monospace;font-size:10px;color:#9A8370;text-transform:uppercase;letter-spacing:.05em;margin-top:4px">{{ it.colorName }}</div>
+                      </div>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isFit }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:62px 22px 0;background:url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22420%22%20height%3D%22900%22%3E%3Cfilter%20id%3D%22w%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.62%200.006%22%20numOctaves%3D%225%22%20seed%3D%2211%22%2F%3E%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200.07%200%200%200%200%200.04%200%200%200%200%200.02%200%200%200%200.7%20-0.12%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22420%22%20height%3D%22900%22%20filter%3D%22url(%23w)%22%2F%3E%3C%2Fsvg%3E'),linear-gradient(180deg,#1B120C 0%,#281B10 100%)">
+              <div style="font-family:'Instrument Serif',Georgia,serif;font-size:30px;color:#F4E7D9">Fit Check</div>
+
+              <sc-if value="{{ fitIdle }}" hint-placeholder-val="{{ true }}">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding-bottom:36px">
+                  <div style="font-size:15px;color:#AC9683;max-width:250px;line-height:1.5">Wearing something right now? Let's see it.</div>
+                  <button onClick="{{ runFit }}" style="width:150px;height:150px;border-radius:99px;border:none;background:linear-gradient(150deg,#946E4A 0%,#5F452D 100%);color:#F7EADD;font-family:'Instrument Serif',serif;font-size:24px;cursor:pointer;box-shadow:0 18px 38px rgba(0,0,0,.5)" style-hover="background:#946E4A">Snap it</button>
+                  <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:#8E7965;letter-spacing:.06em;text-transform:uppercase">one tap · no filters</div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ fitScanning }}" hint-placeholder-val="{{ false }}">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding-bottom:36px">
+                  <div style="width:70px;height:70px;border-radius:99px;border:4px solid rgba(188,150,112,.2);border-top-color:#BC9670;animation:cySpin .9s linear infinite"></div>
+                  <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9A8370">reading the fit…</div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ fitDone }}" hint-placeholder-val="{{ false }}">
+                <div style="flex:1;min-height:0;overflow:auto;padding-bottom:18px;display:flex;flex-direction:column;gap:14px;animation:cyRise .3s ease">
+                  <div style="margin-top:12px;background:#120B07;border:1px solid rgba(240,225,210,.08);border-radius:26px;padding:24px;color:#F0E1D2;display:flex;align-items:center;gap:20px">
+                    <div style="font-family:'Instrument Serif',serif;font-size:62px;line-height:.9;color:#CFAE87">{{ fitScore }}</div>
+                    <div>
+                      <div style="font-family:'Instrument Serif',serif;font-size:23px;line-height:1.1;color:#F4E7D9">{{ fitVerdict }}</div>
+                      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#8E7965;margin-top:6px">out of 10 · today's fit</div>
+                    </div>
+                  </div>
+                  <div style="background:#271A12;border:1px solid rgba(240,225,210,.09);border-radius:22px;padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+                    <sc-for list="{{ fitBars }}" as="b" hint-placeholder-count="3">
+                      <div>
+                        <div style="display:flex;align-items:baseline;gap:10px;justify-content:space-between;font-size:13.5px;color:#AC9683;margin-bottom:9px">
+                          <span style="flex:1;min-width:0">{{ b.label }}</span><span style="flex:none;white-space:nowrap;color:#F0E1D2">{{ b.val }}</span>
+                        </div>
+                        <div style="height:6px;border-radius:99px;background:#3A2619;overflow:hidden">
+                          <div style="height:100%;width:{{ b.pct }};background:{{ b.color }};border-radius:99px"></div>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="background:#271E14;border:1px solid rgba(188,150,112,.28);border-radius:22px;padding:18px 20px">
+                    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#BC9670;margin-bottom:6px">one tweak</div>
+                    <div style="font-size:14.5px;line-height:1.45;color:#EBDACA">{{ fitTip }}</div>
+                  </div>
+                  <button onClick="{{ resetFit }}" style="height:52px;border-radius:17px;border:1.5px solid rgba(240,225,210,.18);background:none;color:#AC9683;font-family:'DM Sans',sans-serif;font-size:15px;cursor:pointer" style-hover="border-color:rgba(240,225,210,.42)">Try another fit</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <div style="display:flex;padding:10px 18px 30px;background:rgba(18,11,7,.92);border-top:1px solid rgba(240,225,210,.08);backdrop-filter:blur(12px)">
+            <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+              <button onClick="{{ t.go }}" style="flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 0;color:{{ t.color }};font-family:'DM Sans',sans-serif">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="{{ t.color }}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="{{ t.path }}"></path>
+                  <circle cx="{{ t.cx }}" cy="{{ t.cy }}" r="{{ t.r }}"></circle>
+                </svg>
+                <span style="font-size:11px;letter-spacing:.01em">{{ t.label }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showDetail }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22420%22%20height%3D%22900%22%3E%3Cfilter%20id%3D%22w%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.62%200.006%22%20numOctaves%3D%225%22%20seed%3D%2211%22%2F%3E%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200.07%200%200%200%200%200.04%200%200%200%200%200.02%200%200%200%200.7%20-0.12%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22420%22%20height%3D%22900%22%20filter%3D%22url(%23w)%22%2F%3E%3C%2Fsvg%3E'),linear-gradient(180deg,#20150E 0%,#1B120C 100%);display:flex;flex-direction:column;animation:cyRise .22s ease;z-index:30">
+          <div style="height:250px;background:{{ detailColor }};position:relative;overflow:hidden;flex:none">
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.16) 0 8px,transparent 8px 16px)"></div>
+            <button onClick="{{ closeDetail }}" style="position:absolute;top:58px;left:18px;width:38px;height:38px;border-radius:99px;border:none;background:rgba(18,11,7,.85);color:#F0E1D2;font-size:17px;cursor:pointer">←</button>
+            <div style="position:absolute;left:22px;bottom:14px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:rgba(20,12,8,.7)">item photo</div>
+          </div>
+          <div style="flex:1;min-height:0;overflow:auto;padding:20px 22px 26px">
+            <div style="font-family:'Instrument Serif',Georgia,serif;font-size:28px;line-height:1.1;color:#F4E7D9">{{ detailType }}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#9A8370;margin:8px 0 20px">auto-tagged · tap to correct</div>
+            <sc-for list="{{ detailFields }}" as="f" hint-placeholder-count="3">
+              <div style="margin-bottom:18px">
+                <div style="font-size:13px;color:#AC9683;margin-bottom:8px">{{ f.label }}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  <sc-for list="{{ f.options }}" as="o" hint-placeholder-count="4">
+                    <button onClick="{{ o.pick }}" style="padding:9px 14px;border-radius:99px;border:1.5px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }};font-family:'DM Sans',sans-serif;font-size:13.5px;cursor:pointer" style-hover="border-color:#946E4A">{{ o.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <button onClick="{{ saveDetail }}" style="width:100%;height:54px;margin-top:6px;border:none;border-radius:17px;background:#7E5C3C;color:#F7EADD;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer" style-hover="background:#946E4A">Save tags</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showAdd }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22420%22%20height%3D%22900%22%3E%3Cfilter%20id%3D%22w%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.62%200.006%22%20numOctaves%3D%225%22%20seed%3D%2211%22%2F%3E%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220%200%200%200%200.07%200%200%200%200%200.04%200%200%200%200%200.02%200%200%200%200.7%20-0.12%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22420%22%20height%3D%22900%22%20filter%3D%22url(%23w)%22%2F%3E%3C%2Fsvg%3E'),linear-gradient(180deg,#150E08 0%,#0D0805 100%);color:#F0E1D2;display:flex;flex-direction:column;padding:62px 24px 34px;z-index:40">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <button onClick="{{ closeAdd }}" style="width:38px;height:38px;border-radius:99px;border:none;background:rgba(240,225,210,.1);color:#F0E1D2;font-size:17px;cursor:pointer">←</button>
+            <div style="font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:#9A8370">{{ addStatus }}</div>
+            <div style="width:38px"></div>
+          </div>
+          <div style="flex:1;border-radius:28px;border:1.5px dashed rgba(240,225,210,.22);background:rgba(240,225,210,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+            <div style="width:150px;height:150px;border-radius:22px;background:repeating-linear-gradient(45deg,rgba(240,225,210,.1) 0 7px,transparent 7px 14px);border:1px solid rgba(240,225,210,.16)"></div>
+            <div style="font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.08em;color:#8E7965;text-transform:uppercase">lay the item flat</div>
+          </div>
+          <div style="display:flex;justify-content:center;margin-top:24px">
+            <button onClick="{{ addItem }}" style="width:76px;height:76px;border-radius:99px;border:4px solid rgba(240,225,210,.8);background:#7E5C3C;cursor:pointer" style-hover="background:#946E4A"></button>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </x-import>
+
+  <div style="font-family:'DM Mono',monospace;font-size:10.5px;color:#8E7965;letter-spacing:.05em;text-align:center;max-width:420px;line-height:1.7">{{ footnote }}</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:480,&quot;height&quot;:1040}}">
+const MAH = '#7E5C3C', MAH_HI = '#946E4A', EMBER = '#BC9670', TAN = '#A98B66';
+const SWATCH = { Oatmeal:'#C9B694', Indigo:'#5A6E8E', Rust:'#B06A42', Olive:'#7E805A', Cream:'#D9CDB6', Charcoal:'#5A534B', Denim:'#6E8CA8', Camel:'#BE9165', Black:'#4A443E', White:'#DED9CE' };
+const SEED = [
+  { id:1, type:'Linen shirt', cat:'Shirt', colorName:'Oatmeal', fit:'Relaxed', needsReview:false },
+  { id:2, type:'Straight jeans', cat:'Jeans', colorName:'Denim', fit:'Straight', needsReview:true },
+  { id:3, type:'Knit cardigan', cat:'Knitwear', colorName:'Rust', fit:'Relaxed', needsReview:false },
+  { id:4, type:'Leather boots', cat:'Shoes', colorName:'Camel', fit:'Regular', needsReview:false },
+  { id:5, type:'Cotton tee', cat:'Tee', colorName:'Cream', fit:'Regular', needsReview:false },
+  { id:6, type:'Wool trousers', cat:'Trousers', colorName:'Charcoal', fit:'Straight', needsReview:true },
+  { id:7, type:'Denim jacket', cat:'Jacket', colorName:'Indigo', fit:'Relaxed', needsReview:false }
+];
+const OUTFITS = [
+  { name:'Easy Tuesday', match:'94% you', ids:[1,2,4,3], why:'Warm neutrals you already reach for, with the cardigan adding length to balance your proportions.' },
+  { name:'Quiet Sharp', match:'89% you', ids:[5,6,4,7], why:'Structured trousers against a soft tee — dressed up without feeling like you tried.' },
+  { name:'Layered Walk', match:'86% you', ids:[1,6,7,4], why:'Two mid-weight layers for a 14° day; the indigo pulls the camel boots forward.' }
+];
+const TYPES = ['Shirt','Tee','Knitwear','Jacket','Trousers','Jeans','Shoes'];
+const COLORS = ['Oatmeal','Cream','Rust','Camel','Denim','Indigo','Olive','Charcoal','Black','White'];
+const FITS = ['Slim','Regular','Relaxed','Straight'];
+const VERDICTS = [[9,'Undeniable.'],[8,'Very put together.'],[7,'Solid, easy fit.'],[6,'Works — barely trying.']];
+const ICONS = {
+  recs:   { path:'M12 3.2l1.9 4.6 4.9.4-3.7 3.2 1.1 4.8L12 13.7 7.8 16.2l1.1-4.8L5.2 8.2l4.9-.4z M5 19.5h14', cx:0, cy:0, r:0 },
+  closet: { path:'M12 8.2V7a2 2 0 1 1 2-2 M12 8.2L3.9 14.6c-.8.6-.4 1.9.6 1.9h15c1 0 1.4-1.3.6-1.9L12 8.2z M8 19.5h8', cx:0, cy:0, r:0 },
+  fit:    { path:'M3.6 9.4a1.6 1.6 0 0 1 1.6-1.6h1.9l1.2-2h5.4l1.2 2h1.9a1.6 1.6 0 0 1 1.6 1.6v7.2a1.6 1.6 0 0 1-1.6 1.6H5.2a1.6 1.6 0 0 1-1.6-1.6z', cx:12, cy:13, r:3 }
+};
+
+class Component extends DCLogic {
+  state = {
+    screen: 'welcome', basicsStep: 1, gender: 'Woman', age: 29, height: 168, weight: 62,
+    hUnit: 'cm', wUnit: 'kg', shot: 0, tab: 'recs', items: SEED.slice(), outfit: 0, worn: false,
+    detailId: null, draft: null, add: false, addCount: 0, fit: 'idle', fitScore: 8
+  };
+
+  set(k, v) { this.setState({ [k]: v }); }
+
+  renderVals() {
+    const s = this.state;
+    const byId = id => s.items.find(i => i.id === id) || SEED.find(i => i.id === id);
+    const jump = (label, screen) => ({
+      label, bg: this.activeJump(screen) ? MAH : '#221710',
+      fg: this.activeJump(screen) ? '#F7EADD' : '#AC9683',
+      border: this.activeJump(screen) ? MAH : 'rgba(240,225,210,.14)',
+      go: () => this.goJump(screen)
+    });
+    const detail = s.draft;
+    const chip = (val, cur, pick) => ({
+      label: val, pick,
+      bg: val === cur ? '#2F2417' : '#271A12',
+      fg: val === cur ? '#CFAE87' : '#AC9683',
+      border: val === cur ? MAH_HI : 'rgba(240,225,210,.14)'
+    });
+
+    const outfit = OUTFITS[s.outfit % OUTFITS.length];
+
+    return {
+      jumps: [
+        jump('Welcome', 'welcome'), jump('Basics', 'basics'), jump('Photo', 'capture'),
+        jump('Empty home', 'empty'), jump('Outfits', 'recs'), jump('Closet', 'closet'),
+        jump('Item tags', 'detail'), jump('Fit Check', 'fit')
+      ],
+      isWelcome: s.screen === 'welcome',
+      isBasics: s.screen === 'basics',
+      isBasics1: s.basicsStep === 1, isBasics2: s.basicsStep === 2,
+      isCapture: s.screen === 'capture', isReady: s.screen === 'ready', isApp: s.screen === 'app',
+      start: () => this.setState({ screen: 'basics', basicsStep: 1 }),
+      steps: [1, 2, 3].map(n => ({ bg: s.basicsStep >= n ? MAH_HI : '#3A2619' })),
+      basicsKicker: s.basicsStep === 1 ? 'Step 1 of 3' : 'Step 2 of 3',
+      basicsTitle: s.basicsStep === 1 ? 'A little about you' : 'Your measurements',
+      genderOpts: ['Woman', 'Man', 'Non-binary', 'Prefer not to say'].map(g => ({
+        label: g, pick: () => this.set('gender', g),
+        bg: s.gender === g ? '#2F2417' : '#271A12',
+        border: s.gender === g ? MAH_HI : 'rgba(240,225,210,.12)',
+        dot: s.gender === g ? EMBER : '#3A2619'
+      })),
+      age: s.age, setAge: e => this.set('age', +e.target.value),
+      height: s.height, setHeight: e => this.set('height', +e.target.value),
+      weight: s.weight, setWeight: e => this.set('weight', +e.target.value),
+      heightLabel: s.hUnit === 'cm' ? `${s.height} cm` : `${Math.floor(s.height / 30.48)}′ ${Math.round((s.height / 2.54) % 12)}″`,
+      weightLabel: s.wUnit === 'kg' ? `${s.weight} kg` : `${Math.round(s.weight * 2.2046)} lb`,
+      heightUnits: ['cm', 'ft/in'].map(u => ({
+        label: u, pick: () => this.set('hUnit', u),
+        bg: s.hUnit === u ? '#7E5C3C' : 'transparent',
+        fg: s.hUnit === u ? '#F7EEDF' : '#9A8370'
+      })),
+      weightUnits: ['kg', 'lb'].map(u => ({
+        label: u, pick: () => this.set('wUnit', u),
+        bg: s.wUnit === u ? '#7E5C3C' : 'transparent',
+        fg: s.wUnit === u ? '#F7EEDF' : '#9A8370'
+      })),
+      nextBasics: () => s.basicsStep === 1 ? this.set('basicsStep', 2) : this.setState({ screen: 'capture', shot: 0 }),
+
+      shotDots: [0, 1, 2].map(n => ({ bg: n < s.shot ? MAH_HI : n === s.shot ? EMBER : 'rgba(240,225,210,.18)' })),
+      shotTitle: ['Face, straight on', 'Full body, front', 'Full body, side'][Math.min(s.shot, 2)],
+      shotHint: ['Neutral light, no sunglasses', 'Arms relaxed, feet in frame', 'Turn left, stand tall'][Math.min(s.shot, 2)],
+      shotSlot: `photo ${Math.min(s.shot + 1, 3)} of 3`,
+      capture: () => s.shot >= 2 ? this.set('screen', 'ready') : this.set('shot', s.shot + 1),
+      skipShot: () => s.shot >= 2 ? this.set('screen', 'ready') : this.set('shot', s.shot + 1),
+      enterApp: () => this.setState({ screen: 'app', tab: 'recs' }),
+
+      isRecs: s.tab === 'recs', isCloset: s.tab === 'closet', isFit: s.tab === 'fit',
+      recsEmpty: s.items.length < 4, hasRecs: s.items.length >= 4,
+      weatherLine: '14° · light rain',
+      outfitName: outfit.name, outfitMatch: outfit.match, outfitWhy: outfit.why,
+      outfitItems: outfit.ids.map(id => { const it = byId(id); return { name: it.type, color: SWATCH[it.colorName] || '#C9B694' }; }),
+      skipOutfit: () => this.setState({ outfit: s.outfit + 1, worn: false }),
+      wearOutfit: () => this.set('worn', true),
+      wearLabel: s.worn ? 'Wearing this ✓' : "I'll wear this",
+      wearBg: s.worn ? '#533C27' : MAH,
+      goAdd: () => this.set('add', true),
+
+      items: s.items.map(it => ({
+        type: it.type, colorName: it.colorName, needsReview: it.needsReview,
+        color: SWATCH[it.colorName] || '#C9B694',
+        open: () => this.setState({ detailId: it.id, draft: { ...it } })
+      })),
+      itemCountLabel: `${s.items.length} items`,
+
+      tabs: [
+        { key: 'recs', label: 'Today' },
+        { key: 'closet', label: 'Closet' },
+        { key: 'fit', label: 'Fit Check' }
+      ].map(t => ({
+        label: t.label,
+        path: ICONS[t.key].path, cx: ICONS[t.key].cx, cy: ICONS[t.key].cy, r: ICONS[t.key].r,
+        color: s.tab === t.key ? EMBER : '#7A6653',
+        go: () => this.setState({ tab: t.key })
+      })),
+
+      showDetail: !!detail,
+      detailType: detail ? detail.type : '',
+      detailColor: detail ? (SWATCH[detail.colorName] || '#C9B694') : '#C9B694',
+      detailFields: detail ? [
+        { label: 'Type', options: TYPES.map(v => chip(v, detail.cat, () => this.setState({ draft: { ...detail, cat: v, type: v } }))) },
+        { label: 'Colour', options: COLORS.map(v => chip(v, detail.colorName, () => this.setState({ draft: { ...detail, colorName: v } }))) },
+        { label: 'Fit', options: FITS.map(v => chip(v, detail.fit, () => this.setState({ draft: { ...detail, fit: v } }))) }
+      ] : [],
+      closeDetail: () => this.setState({ detailId: null, draft: null }),
+      saveDetail: () => this.setState({
+        items: s.items.map(i => i.id === detail.id ? { ...detail, needsReview: false } : i),
+        detailId: null, draft: null
+      }),
+
+      showAdd: s.add,
+      addStatus: s.addCount ? `${s.addCount} added this session` : 'new item',
+      closeAdd: () => this.set('add', false),
+      addItem: () => {
+        const pool = [
+          { type: 'Ribbed knit', cat: 'Knitwear', colorName: 'Olive', fit: 'Regular' },
+          { type: 'Pleated skirt', cat: 'Trousers', colorName: 'Charcoal', fit: 'Regular' },
+          { type: 'Canvas sneakers', cat: 'Shoes', colorName: 'White', fit: 'Regular' },
+          { type: 'Overshirt', cat: 'Jacket', colorName: 'Indigo', fit: 'Relaxed' }
+        ];
+        const pick = pool[s.addCount % pool.length];
+        const item = { ...pick, id: Date.now(), needsReview: true };
+        this.setState({ items: [item, ...s.items], addCount: s.addCount + 1, add: false, tab: 'closet', detailId: item.id, draft: { ...item } });
+      },
+
+      fitIdle: s.fit === 'idle', fitScanning: s.fit === 'scanning', fitDone: s.fit === 'done',
+      runFit: () => { this.set('fit', 'scanning'); setTimeout(() => this.setState({ fit: 'done', fitScore: 6 + Math.floor(Math.random() * 4) }), 1300); },
+      resetFit: () => this.set('fit', 'idle'),
+      fitScore: s.fitScore,
+      fitVerdict: (VERDICTS.find(v => v[0] <= s.fitScore) || VERDICTS[3])[1],
+      fitBars: [
+        { label: 'Colour harmony', val: 'Strong', pct: '86%', color: EMBER },
+        { label: 'Proportion', val: 'Good', pct: '72%', color: TAN },
+        { label: 'Newness vs. usual', val: 'Familiar', pct: '48%', color: '#6A5741' }
+      ],
+      fitTip: 'Cuff the trousers once — it lets the boots read as part of the outfit, not an afterthought.',
+      footnote: 'Tap the chips above to jump between screens · every screen is live'
+    };
+  }
+
+  activeJump(screen) {
+    const s = this.state;
+    if (screen === 'empty') return s.screen === 'app' && s.items.length < 4 && s.tab === 'recs';
+    if (screen === 'recs') return s.screen === 'app' && s.tab === 'recs' && s.items.length >= 4;
+    if (screen === 'closet') return s.screen === 'app' && s.tab === 'closet' && !s.draft;
+    if (screen === 'fit') return s.screen === 'app' && s.tab === 'fit';
+    if (screen === 'detail') return !!s.draft;
+    return s.screen === screen;
+  }
+
+  goJump(screen) {
+    const s = this.state;
+    if (screen === 'empty') return this.setState({ screen: 'app', tab: 'recs', items: [], draft: null, detailId: null, add: false });
+    if (screen === 'recs') return this.setState({ screen: 'app', tab: 'recs', items: s.items.length >= 4 ? s.items : SEED.slice(), draft: null, detailId: null, add: false });
+    if (screen === 'closet') return this.setState({ screen: 'app', tab: 'closet', items: s.items.length ? s.items : SEED.slice(), draft: null, detailId: null, add: false });
+    if (screen === 'fit') return this.setState({ screen: 'app', tab: 'fit', fit: 'idle', draft: null, detailId: null, add: false });
+    if (screen === 'detail') { const it = (s.items.length ? s.items : SEED)[1]; return this.setState({ screen: 'app', tab: 'closet', items: s.items.length ? s.items : SEED.slice(), detailId: it.id, draft: { ...it }, add: false }); }
+    if (screen === 'basics') return this.setState({ screen: 'basics', basicsStep: 1, draft: null, add: false });
+    if (screen === 'capture') return this.setState({ screen: 'capture', shot: 0, draft: null, add: false });
+    return this.setState({ screen, draft: null, detailId: null, add: false });
+  }
+}
+
+</script>
+</body>
+</html>

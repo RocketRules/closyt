@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Closyt",
+    "slug": "closyt",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#1B120C",
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Closyt uses the camera to build your body profile and to photograph the clothes in your closet.",
+        "NSPhotoLibraryUsageDescription": "Closyt can add clothes to your closet from photos you already have."
+      }
+    },
+    "android": {
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#1B120C",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#1B120C"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Closyt uses the camera to build your body profile and to photograph the clothes in your closet."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Closyt can add clothes to your closet from photos you already have."
+        }
+      ],
+      "expo-asset"
+    ]
+  }
+}
