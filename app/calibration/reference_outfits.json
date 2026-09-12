@@ -1,0 +1,56 @@
+{
+  "references": [
+    {
+      "label": "good",
+      "target_score": 8.5,
+      "items": [
+        "navy oxford shirt",
+        "charcoal wool pants",
+        "black derby shoes",
+        "black dress socks",
+        "navy blazer"
+      ],
+      "note": "Cohesive formal palette, tight formality band, classic proportions.",
+      "subscores": {
+        "color_harmony": 9.0,
+        "style_cohesion": 8.5,
+        "formality_consistency": 9.0,
+        "body_flattery": 8.0
+      }
+    },
+    {
+      "label": "mediocre",
+      "target_score": 5.5,
+      "items": [
+        "white tee",
+        "khaki shorts",
+        "black derby shoes",
+        "white athletic socks"
+      ],
+      "note": "Wearable but formality clash between sneakers-casual shorts and dress shoes.",
+      "subscores": {
+        "color_harmony": 6.5,
+        "style_cohesion": 5.0,
+        "formality_consistency": 4.0,
+        "body_flattery": 6.0
+      }
+    },
+    {
+      "label": "bad",
+      "target_score": 2.5,
+      "items": [
+        "neon orange graphic tee",
+        "charcoal wool pants",
+        "white sneakers",
+        "black dress socks"
+      ],
+      "note": "Loud clash colors, extreme formality mismatch, incoherent vibe.",
+      "subscores": {
+        "color_harmony": 2.0,
+        "style_cohesion": 2.5,
+        "formality_consistency": 2.0,
+        "body_flattery": 3.5
+      }
+    }
+  ]
+}
