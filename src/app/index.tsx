@@ -18,7 +18,7 @@ export default function PresentationScreen() {
 
   return (
     <Screen
-      step="1 / 5"
+      step="1 / 3"
       title="Who are we dressing?"
       subtitle="This only switches the outfit rule book. We never infer it from your photo."
       showBack={false}

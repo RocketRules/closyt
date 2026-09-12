@@ -58,18 +58,18 @@ export default function SelfieScreen() {
     const profile = await buildProfileFromDraft(
       skipPhoto ? { selfieUri: null } : undefined,
     );
-    if (profile) router.push('/wardrobe');
+    if (profile) router.push('/done');
   }
 
   return (
     <Screen
-      step="3 / 5"
+      step="3 / 3"
       title="A casual selfie"
       subtitle="Chest-up is fine. We use it as a quiet color and vibe check — not a body scan."
       footer={
         <>
           <Button
-            label={buildingProfile ? 'Reading your proportions…' : 'Continue'}
+            label={buildingProfile ? 'Saving your profile…' : 'Save profile'}
             disabled={busy || buildingProfile}
             onPress={() => void continueNext(false)}
           />

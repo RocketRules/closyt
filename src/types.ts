@@ -31,6 +31,7 @@ export type VisionSignals = {
   confidence: Confidence;
 };
 
+/** Internal fit payload. Saved on device now; another Closyt surface will consume it later. */
 export type BodyProfile = {
   presentation: Presentation;
   heightCm: number;

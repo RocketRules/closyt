@@ -12,7 +12,7 @@ export default function MeasurementsScreen() {
 
   return (
     <Screen
-      step="2 / 5"
+      step="2 / 3"
       title="Height and weight"
       subtitle="We’ll use these for fit and proportion. Nothing here is shown as a body-type label."
       footer={
