@@ -49,8 +49,7 @@
         {
           "photosPermission": "Closyt can add clothes to your closet from photos you already have."
         }
-      ],
-      "expo-asset"
+      ]
     ]
   }
 }

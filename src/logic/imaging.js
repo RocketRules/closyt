@@ -1,9 +1,8 @@
 /*
  * Turning a photo into pixels.
  *
- * Both the colour detector and the classifier need the same thing: a small
- * RGBA buffer. Decoding is the expensive step, so this does it once and hands
- * the same buffer to both.
+ * Colour detection needs an RGBA buffer; the FashionCLIP server needs a small
+ * JPEG. One resize produces both, so the photo is only processed once.
  *
  * Downscaling first is not optional — a full-resolution phone photo is
  * ~12 megapixels, and decoding that in pure JavaScript would stall the UI
@@ -39,8 +38,10 @@ function base64ToBytes(b64) {
 }
 
 /*
- * Resize to `size` on the long edge and decode to RGBA.
- * Returns { data: Uint8Array (RGBA), width, height }.
+ * Resize to `size` square and decode to RGBA.
+ * 224px is CLIP's native input, so the same bytes serve the server and the
+ * colour detector, and the upload stays ~15KB.
+ * Returns { data: Uint8Array (RGBA), width, height, base64 }.
  */
 export async function loadPixels(uri, size = 224) {
   const result = await manipulateAsync(uri, [{ resize: { width: size, height: size } }], {
@@ -55,5 +56,11 @@ export async function loadPixels(uri, size = 224) {
   /* useTArray keeps jpeg-js on typed arrays instead of allocating a Buffer. */
   const raw = decodeJpeg(bytes, { useTArray: true, formatAsRGBA: true });
 
-  return { data: raw.data, width: raw.width, height: raw.height, uri: result.uri };
+  return {
+    data: raw.data,
+    width: raw.width,
+    height: raw.height,
+    base64: result.base64,
+    uri: result.uri,
+  };
 }

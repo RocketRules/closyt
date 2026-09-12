@@ -1,14 +1,27 @@
 import React, { useRef, useState } from 'react';
-import { View, Pressable, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { View, Pressable, Text, StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, Mono, Body, PrimaryButton } from '../components/ui';
-import FlipButton from '../components/FlipButton';
 import { tagGarment } from '../logic/tagging';
 import { C, F } from '../theme/theme';
 
-export default function AddItemSheet({ addedThisSession, onClose, onAdded }) {
+const isWeb = Platform.OS === 'web';
+
+/* Only import camera on native — it crashes the web bundler. */
+let CameraView = null;
+let useCameraPermissions = () => [{ granted: false }, () => {}];
+let FlipButton = () => null;
+if (!isWeb) {
+  try {
+    const cam = require('expo-camera');
+    CameraView = cam.CameraView;
+    useCameraPermissions = cam.useCameraPermissions;
+    FlipButton = require('../components/FlipButton').default;
+  } catch {}
+}
+
+export default function AddItemSheet({ addedThisSession, taggerUp, onClose, onAdded }) {
   const [busy, setBusy] = useState(false);
   const [facing, setFacing] = useState('back');
   const [permission, requestPermission] = useCameraPermissions();
@@ -17,9 +30,14 @@ export default function AddItemSheet({ addedThisSession, onClose, onAdded }) {
 
   const handlePhoto = async (uri) => {
     setBusy(true);
-    const item = await tagGarment(uri);
-    setBusy(false);
-    onAdded(item);
+    try {
+      const item = await tagGarment(uri);
+      onAdded(item);
+    } catch (e) {
+      console.warn('tagGarment failed:', e);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const shoot = async () => {
@@ -32,11 +50,12 @@ export default function AddItemSheet({ addedThisSession, onClose, onAdded }) {
     }
   };
 
-  /* Falls back to the library when the camera is unavailable (simulators). */
   const pick = async () => {
     const res = await ImagePicker.launchImageLibraryAsync({ quality: 0.6 });
     if (!res.canceled && res.assets?.length) await handlePhoto(res.assets[0].uri);
   };
+
+  const cameraAvailable = !isWeb && permission?.granted && CameraView;
 
   return (
     <Screen
@@ -50,49 +69,71 @@ export default function AddItemSheet({ addedThisSession, onClose, onAdded }) {
         <Mono size={10.5} color={busy ? C.ember : C.dim}>
           {busy
             ? 'reading the garment…'
-            : addedThisSession
-              ? `${addedThisSession} added this session`
-              : 'new item'}
+            : !taggerUp
+              ? 'tagger offline · colour only'
+              : addedThisSession
+                ? `${addedThisSession} added this session`
+                : 'new item'}
         </Mono>
         <View style={{ width: 38 }} />
       </View>
 
       <View style={styles.frame}>
-        {permission?.granted ? (
+        {cameraAvailable ? (
           <CameraView ref={camera} facing={facing} style={StyleSheet.absoluteFill} />
         ) : (
           <View style={styles.fallback}>
             <View style={styles.plate} />
             <Body size={13.5} color={C.dim} style={{ textAlign: 'center', maxWidth: 220 }}>
-              Closyt needs the camera to read your garments.
+              {isWeb
+                ? 'Tap below to add a garment photo from your files.'
+                : 'Closyt needs the camera to read your garments.'}
             </Body>
-            <PrimaryButton label="Allow camera" onPress={requestPermission} height={46} />
+            {!isWeb && (
+              <PrimaryButton label="Allow camera" onPress={requestPermission} height={46} />
+            )}
           </View>
         )}
         <View pointerEvents="none" style={styles.caption}>
-          <Mono size={10.5} color="rgba(240,225,210,.6)">lay the item flat</Mono>
+          <Mono size={10.5} color="rgba(240,225,210,.6)">
+            {isWeb ? 'upload a flat-lay photo' : 'lay the item flat'}
+          </Mono>
         </View>
       </View>
 
       <View style={[styles.controls, { marginBottom: 34 + insets.bottom }]}>
         <Pressable onPress={pick} style={styles.side}>
-          <Text style={styles.sideLabel}>Library</Text>
+          <Text style={styles.sideLabel}>{isWeb ? 'Upload' : 'Library'}</Text>
         </Pressable>
-        <Pressable
-          onPress={shoot}
-          disabled={!permission?.granted || busy}
-          style={({ pressed }) => [
-            styles.shutter,
-            { backgroundColor: pressed ? C.mahHi : C.mah, opacity: permission?.granted ? 1 : 0.4 },
-          ]}
-        >
-          {busy && <ActivityIndicator color="#F7EADD" />}
-        </Pressable>
-        <View style={[styles.side, { alignItems: 'flex-end' }]}>
-          {permission?.granted && (
-            <FlipButton onPress={() => setFacing((f) => (f === 'back' ? 'front' : 'back'))} />
-          )}
-        </View>
+
+        {!isWeb && (
+          <Pressable
+            onPress={shoot}
+            disabled={!cameraAvailable || busy}
+            style={({ pressed }) => [
+              styles.shutter,
+              { backgroundColor: pressed ? C.mahHi : C.mah, opacity: cameraAvailable ? 1 : 0.4 },
+            ]}
+          >
+            {busy && <ActivityIndicator color="#F7EADD" />}
+          </Pressable>
+        )}
+
+        {isWeb ? (
+          <Pressable onPress={pick} disabled={busy} style={styles.webUpload}>
+            {busy ? (
+              <ActivityIndicator color="#F7EADD" />
+            ) : (
+              <Text style={styles.webUploadLabel}>＋ Add photo</Text>
+            )}
+          </Pressable>
+        ) : (
+          <View style={[styles.side, { alignItems: 'flex-end' }]}>
+            {cameraAvailable && FlipButton && (
+              <FlipButton onPress={() => setFacing((f) => (f === 'back' ? 'front' : 'back'))} />
+            )}
+          </View>
+        )}
       </View>
     </Screen>
   );
@@ -140,4 +181,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  webUpload: {
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: C.mah,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  webUploadLabel: { fontFamily: F.sans, fontSize: 14, color: C.text, fontWeight: '500' },
 });

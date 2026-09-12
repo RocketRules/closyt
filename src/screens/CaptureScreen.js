@@ -1,10 +1,23 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, Pressable, Image, StyleSheet, ActivityIndicator } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { View, Text, Pressable, Image, StyleSheet, ActivityIndicator, Platform } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, Display, Mono, Body, PrimaryButton } from '../components/ui';
-import FlipButton from '../components/FlipButton';
 import { C, F } from '../theme/theme';
+
+const isWeb = Platform.OS === 'web';
+
+let CameraView = null;
+let useCameraPermissions = () => [{ granted: false }, () => {}];
+let FlipButton = () => null;
+if (!isWeb) {
+  try {
+    const cam = require('expo-camera');
+    CameraView = cam.CameraView;
+    useCameraPermissions = cam.useCameraPermissions;
+    FlipButton = require('../components/FlipButton').default;
+  } catch {}
+}
 
 const SHOTS = [
   { title: 'Face, straight on', hint: 'Neutral light, no sunglasses', facing: 'front' },
@@ -22,11 +35,6 @@ export default function CaptureScreen({ onDone }) {
   const insets = useSafeAreaInsets();
 
   const current = SHOTS[Math.min(shot, 2)];
-
-  /*
-   * Each shot suggests a lens (selfie for the face, rear for full body), but
-   * the user can override it and that choice sticks until the next shot.
-   */
   const [facing, setFacing] = useState(SHOTS[0].facing);
   useEffect(() => {
     setFacing(SHOTS[Math.min(shot, 2)].facing);
@@ -46,7 +54,6 @@ export default function CaptureScreen({ onDone }) {
     try {
       const photo = await camera.current.takePictureAsync({ quality: 0.6, skipProcessing: true });
       setPreview(photo.uri);
-      /* Let the user see the frame land before moving on. */
       setTimeout(() => advance(photo.uri), 550);
     } catch {
       advance(null);
@@ -54,6 +61,16 @@ export default function CaptureScreen({ onDone }) {
       setBusy(false);
     }
   };
+
+  const pickFromLibrary = async () => {
+    const res = await ImagePicker.launchImageLibraryAsync({ quality: 0.6 });
+    if (!res.canceled && res.assets?.length) {
+      setPreview(res.assets[0].uri);
+      setTimeout(() => advance(res.assets[0].uri), 550);
+    }
+  };
+
+  const cameraAvailable = !isWeb && permission?.granted && CameraView;
 
   return (
     <Screen colors={[C.bgDarkTop, C.bgDarkBottom]} style={{ paddingHorizontal: 24, paddingTop: insets.top + 20 }}>
@@ -72,24 +89,30 @@ export default function CaptureScreen({ onDone }) {
         {current.title}
       </Display>
       <Body size={13.5} color={C.dim} style={{ textAlign: 'center', marginBottom: 20 }}>
-        {current.hint}
+        {isWeb ? 'Upload a photo or skip this step' : current.hint}
       </Body>
 
       <View style={styles.frame}>
         {preview ? (
           <Image source={{ uri: preview }} style={StyleSheet.absoluteFill} resizeMode="cover" />
-        ) : permission?.granted ? (
+        ) : cameraAvailable ? (
           <CameraView ref={camera} facing={facing} style={StyleSheet.absoluteFill} />
         ) : (
           <View style={styles.permission}>
             <View style={styles.silhouette} />
             <Body size={13.5} color={C.dim} style={{ textAlign: 'center', maxWidth: 220 }}>
-              Closyt needs the camera to build your body profile.
+              {isWeb
+                ? 'Camera is not available on web. You can upload photos or skip.'
+                : 'Closyt needs the camera to build your body profile.'}
             </Body>
-            <PrimaryButton label="Allow camera" onPress={requestPermission} height={46} />
+            {isWeb ? (
+              <PrimaryButton label="Upload photo" onPress={pickFromLibrary} height={46} />
+            ) : (
+              <PrimaryButton label="Allow camera" onPress={requestPermission} height={46} />
+            )}
           </View>
         )}
-        {permission?.granted && !preview && (
+        {cameraAvailable && !preview && (
           <View pointerEvents="none" style={styles.guide}>
             <Mono size={10.5} color="rgba(240,225,210,.6)">
               {`photo ${Math.min(shot + 1, 3)} of 3`}
@@ -99,21 +122,29 @@ export default function CaptureScreen({ onDone }) {
       </View>
 
       <View style={[styles.controls, { marginBottom: 34 + insets.bottom }]}>
-        <View style={{ width: 48, alignItems: 'flex-start' }}>
-          {permission?.granted && !preview && (
-            <FlipButton onPress={() => setFacing((f) => (f === 'back' ? 'front' : 'back'))} />
-          )}
-        </View>
-        <Pressable
-          onPress={capture}
-          disabled={!permission?.granted || busy}
-          style={({ pressed }) => [
-            styles.shutter,
-            { backgroundColor: pressed ? C.mahHi : C.mah, opacity: permission?.granted ? 1 : 0.4 },
-          ]}
-        >
-          {busy && <ActivityIndicator color="#F7EADD" />}
-        </Pressable>
+        {!isWeb ? (
+          <>
+            <View style={{ width: 48, alignItems: 'flex-start' }}>
+              {cameraAvailable && !preview && FlipButton && (
+                <FlipButton onPress={() => setFacing((f) => (f === 'back' ? 'front' : 'back'))} />
+              )}
+            </View>
+            <Pressable
+              onPress={capture}
+              disabled={!cameraAvailable || busy}
+              style={({ pressed }) => [
+                styles.shutter,
+                { backgroundColor: pressed ? C.mahHi : C.mah, opacity: cameraAvailable ? 1 : 0.4 },
+              ]}
+            >
+              {busy && <ActivityIndicator color="#F7EADD" />}
+            </Pressable>
+          </>
+        ) : (
+          <Pressable onPress={pickFromLibrary} style={styles.webUpload}>
+            <Text style={styles.webUploadLabel}>Upload</Text>
+          </Pressable>
+        )}
         <Pressable onPress={() => advance(null)} style={{ width: 48 }}>
           <Text style={styles.skip}>Skip</Text>
         </Pressable>
@@ -158,4 +189,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   skip: { fontFamily: F.sans, fontSize: 13, color: C.dim },
+  webUpload: {
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: C.mah,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  webUploadLabel: { fontFamily: F.sans, fontSize: 14, color: C.text, fontWeight: '500' },
 });

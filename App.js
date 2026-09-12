@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,8 +18,8 @@ import ItemDetailSheet from './src/screens/ItemDetailSheet';
 import AddItemSheet from './src/screens/AddItemSheet';
 import TabBar from './src/components/TabBar';
 import { Screen } from './src/components/ui';
-import { wardrobeStats } from './src/logic/recommend';
-import { preloadClassifier } from './src/logic/classifier';
+import { recommendOutfits, wardrobeStats } from './src/logic/recommend';
+import { taggerReady } from './src/logic/tagger';
 import { mergeBodyProfile } from './src/logic/bodyProfile';
 import { buildRankRequest } from './src/logic/mapToFitEngine';
 import { rankOutfits } from './src/logic/fitEngineClient';
@@ -52,8 +52,7 @@ export default function App() {
     InstrumentSerif_400Regular,
   });
 
-  /* One state machine, mirroring the design: onboarding flow then the tabbed app. */
-  const [screen, setScreen] = useState('loading'); // loading | welcome | basics | capture | ready | app
+  const [screen, setScreen] = useState('loading');
   const [tab, setTab] = useState('recs');
   const [profileDraft, setProfileDraft] = useState(DEFAULT_DRAFT);
   const [profile, setProfile] = useState(null);
@@ -64,14 +63,14 @@ export default function App() {
   const [detail, setDetail] = useState(null);
   const [adding, setAdding] = useState(false);
   const [addedThisSession, setAddedThisSession] = useState(0);
-  const [outfits, setOutfits] = useState([]);
-  const [engineStatus, setEngineStatus] = useState('idle'); // idle | loading | ok | error
+  const [taggerUp, setTaggerUp] = useState(false);
+  const [engineStatus, setEngineStatus] = useState('idle');
   const [engineError, setEngineError] = useState(null);
+  const [engineOutfits, setEngineOutfits] = useState([]);
   const rankTimer = useRef(null);
 
-  /* Restore the closet on launch; returning users skip straight past onboarding. */
   useEffect(() => {
-    preloadClassifier();
+    taggerReady().then(setTaggerUp);
     (async () => {
       const [saved, wardrobe, counts] = await Promise.all([
         store.getBodyProfile(),
@@ -95,10 +94,16 @@ export default function App() {
     store.saveWardrobe(next);
   }, []);
 
-  /* Call the fit-scoring engine whenever the wardrobe or profile changes (debounced). */
+  /* Local on-device recommendations as a fallback. */
+  const localOutfits = useMemo(
+    () => recommendOutfits(items, profile, wornCounts),
+    [items, profile, wornCounts]
+  );
+
+  /* Call the fit-scoring engine whenever wardrobe or profile changes (debounced). */
   useEffect(() => {
     if (!profile || !items.length) {
-      setOutfits([]);
+      setEngineOutfits([]);
       setEngineStatus('idle');
       return;
     }
@@ -110,24 +115,21 @@ export default function App() {
         const req = buildRankRequest(items, profile);
         const resp = await rankOutfits(req);
         const mapped = mapEngineOutfits(resp, items);
-        setOutfits(mapped);
+        setEngineOutfits(mapped);
         setEngineStatus('ok');
       } catch (err) {
         console.warn('Fit engine error:', err.message);
         setEngineError(err.message);
-        setOutfits([]);
+        setEngineOutfits([]);
         setEngineStatus('error');
       }
     }, 400);
     return () => { if (rankTimer.current) clearTimeout(rankTimer.current); };
   }, [items, profile]);
 
-  const stats = { total: items.length, inRotation: 0, combinations: outfits.length };
-  if (outfits.length) {
-    const used = new Set();
-    outfits.forEach((o) => o.pieces.forEach((p) => used.add(p.id)));
-    stats.inRotation = used.size;
-  }
+  /* Use engine outfits when available, otherwise local. */
+  const outfits = engineStatus === 'ok' && engineOutfits.length ? engineOutfits : localOutfits;
+  const stats = useMemo(() => wardrobeStats(items, outfits), [items, outfits]);
 
   const finishOnboarding = (photos) => {
     const merged = mergeBodyProfile(profileDraft);
@@ -192,6 +194,8 @@ export default function App() {
           worn={worn}
           stats={stats}
           profile={profile}
+          engineStatus={engineStatus}
+          engineError={engineError}
           onSkipOutfit={() => {
             setOutfitIndex((i) => i + 1);
             setWorn(false);
@@ -223,14 +227,14 @@ export default function App() {
         <View style={StyleSheet.absoluteFill}>
           <AddItemSheet
             addedThisSession={addedThisSession}
+            taggerUp={taggerUp}
             onClose={() => setAdding(false)}
             onAdded={(item) => {
-              const withId = { ...item, id: String(Date.now()) };
+              const withId = { ...item, id: item.id || String(Date.now()) };
               persistItems([withId, ...items]);
               setAddedThisSession((n) => n + 1);
               setAdding(false);
               setTab('closet');
-              /* Straight into tag review, the way the design hands it over. */
               setDetail(withId);
             }}
           />
@@ -240,7 +244,6 @@ export default function App() {
   );
 }
 
-/* The tabbed shell: one of three panes above a persistent tab bar. */
 function MainApp({
   tab,
   setTab,
@@ -250,6 +253,8 @@ function MainApp({
   worn,
   stats,
   profile,
+  engineStatus,
+  engineError,
   onSkipOutfit,
   onWearOutfit,
   onAdd,

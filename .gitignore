@@ -41,6 +41,10 @@ services/outfit-creator/.pytest_cache/
 services/outfit-creator/.env
 services/outfit-creator/scripts/last_*.json
 
+# FashionCLIP tagger
+server/.venv/
+server/__pycache__/
+
 # typescript
 *.tsbuildinfo
 

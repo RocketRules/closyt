@@ -1,0 +1,6 @@
+# CPU-only torch is plenty here and far smaller than the CUDA build.
+torch>=2.4
+transformers>=4.40
+pillow>=10.0
+fastapi>=0.110
+uvicorn>=0.29
