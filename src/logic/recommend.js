@@ -10,7 +10,7 @@
 const ROLE = {
   Shirt: 'top',
   Tee: 'top',
-  Knitwear: 'layer',
+  Knitwear: 'top',
   Jacket: 'layer',
   Trousers: 'bottom',
   Jeans: 'bottom',
@@ -95,9 +95,10 @@ function freshnessScore(pieces, wornCounts) {
 function combos(slots) {
   const out = [];
   const layers = [null, ...slots.layer];
+  const shoeOpts = slots.shoes.length ? slots.shoes : [null];
   slots.top.forEach((top) =>
     slots.bottom.forEach((bottom) =>
-      slots.shoes.forEach((shoes) =>
+      shoeOpts.forEach((shoes) =>
         layers.forEach((layer) => {
           out.push([top, bottom, shoes, layer].filter(Boolean));
         })
@@ -115,7 +116,7 @@ const NAMES = ['Easy Tuesday', 'Quiet Sharp', 'Layered Walk', 'Soft Structure', 
  */
 export function recommendOutfits(items, profile, wornCounts = {}, limit = 8) {
   const slots = byRole(items);
-  if (!slots.top.length || !slots.bottom.length || !slots.shoes.length) return [];
+  if (!slots.top.length || !slots.bottom.length) return [];
 
   const scored = combos(slots).map((pieces) => {
     const parts = [

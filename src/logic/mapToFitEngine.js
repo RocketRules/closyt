@@ -10,7 +10,7 @@
 const CAT_MAP = {
   Shirt: 'shirt',
   Tee: 'shirt',
-  Knitwear: 'sweater',
+  Knitwear: 'shirt',
   Jacket: 'jacket',
   Trousers: 'pant',
   Jeans: 'pant',

@@ -131,19 +131,25 @@ def generate_outfits(items: list[AttributedItem]) -> list[list[AttributedItem]]:
             return []
 
     if not slots["footwear"]:
-        return []
+        if not config.ALLOW_MISSING_FOOTWEAR:
+            return []
+        footwear_opts: list[AttributedItem | None] = [None]
+    else:
+        footwear_opts = list(slots["footwear"])
 
     # Path A: top + bottom
     for top, bottom, footwear, sock, sweater, outer, underwear in product(
         slots["top"],
         slots["bottom"],
-        slots["footwear"],
+        footwear_opts,
         sock_opts,
         sweater_opts,
         outer_opts,
         underwear_opts,
     ):
-        pieces = [top, bottom, footwear]
+        pieces = [top, bottom]
+        if footwear is not None:
+            pieces.append(footwear)
         if sock is not None:
             pieces.append(sock)
         if sweater is not None:
@@ -153,7 +159,7 @@ def generate_outfits(items: list[AttributedItem]) -> list[list[AttributedItem]]:
         if underwear is not None:
             pieces.append(underwear)
 
-        if not _footwear_sock_ok(footwear, sock if isinstance(sock, AttributedItem) else None):
+        if footwear is not None and not _footwear_sock_ok(footwear, sock if isinstance(sock, AttributedItem) else None):
             continue
         attrs = _visible_attrs(pieces)
         if not _formality_ok(attrs):
@@ -165,13 +171,15 @@ def generate_outfits(items: list[AttributedItem]) -> list[list[AttributedItem]]:
     # Path B: onepiece / dress (no separate bottom)
     for onepiece, footwear, sock, sweater, outer, underwear in product(
         slots["onepiece"],
-        slots["footwear"],
+        footwear_opts,
         sock_opts,
         sweater_opts,
         outer_opts,
         underwear_opts,
     ):
-        pieces = [onepiece, footwear]
+        pieces = [onepiece]
+        if footwear is not None:
+            pieces.append(footwear)
         if sock is not None:
             pieces.append(sock)
         if sweater is not None:
@@ -181,7 +189,7 @@ def generate_outfits(items: list[AttributedItem]) -> list[list[AttributedItem]]:
         if underwear is not None:
             pieces.append(underwear)
 
-        if not _footwear_sock_ok(footwear, sock if isinstance(sock, AttributedItem) else None):
+        if footwear is not None and not _footwear_sock_ok(footwear, sock if isinstance(sock, AttributedItem) else None):
             continue
         attrs = _visible_attrs(pieces)
         if not _formality_ok(attrs):

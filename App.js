@@ -69,6 +69,7 @@ export default function App() {
   const [engineError, setEngineError] = useState(null);
   const [engineOutfits, setEngineOutfits] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const rankTimer = useRef(null);
 
   useEffect(() => {
@@ -84,10 +85,8 @@ export default function App() {
       if (saved) {
         setProfile(saved);
         setProfileDraft({ ...DEFAULT_DRAFT, ...saved });
-        setScreen('app');
-      } else {
-        setScreen('welcome');
       }
+      setScreen('welcome');
     })();
   }, []);
 
@@ -120,7 +119,11 @@ export default function App() {
         setEngineOutfits(mapped);
         setEngineStatus('ok');
         /* Also fetch wardrobe gap suggestions (non-blocking). */
-        suggestPieces(req).then(setSuggestions).catch(() => {});
+        setSuggestionsLoading(true);
+        suggestPieces(req)
+          .then(setSuggestions)
+          .catch(() => {})
+          .finally(() => setSuggestionsLoading(false));
       } catch (err) {
         console.warn('Fit engine error:', err.message);
         setEngineError(err.message);
@@ -210,6 +213,7 @@ export default function App() {
           engineStatus={engineStatus}
           engineError={engineError}
           suggestions={suggestions}
+          suggestionsLoading={suggestionsLoading}
           onSkipOutfit={() => {
             setOutfitIndex((i) => i + 1);
             setWorn(false);
@@ -270,6 +274,7 @@ function MainApp({
   engineStatus,
   engineError,
   suggestions,
+  suggestionsLoading,
   onSkipOutfit,
   onWearOutfit,
   onAdd,
@@ -288,6 +293,7 @@ function MainApp({
             engineStatus={engineStatus}
             engineError={engineError}
             suggestions={suggestions}
+            suggestionsLoading={suggestionsLoading}
             onSkip={onSkipOutfit}
             onWear={onWearOutfit}
             onAdd={onAdd}

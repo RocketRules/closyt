@@ -29,6 +29,7 @@ CONSISTENCY_TOLERANCE = 0.3  # max |score_a - score_b| for reliability tests
 #           at most one underwear item.
 FORMALITY_MAX_SPREAD = 2  # reject if max(formality) - min(formality) > this
 ALLOW_MISSING_SOCKS = True  # Closyt main wardrobe has no socks category
+ALLOW_MISSING_FOOTWEAR = True  # Allow outfits without shoes for limited wardrobes
 
 # Season tags used by CV descriptions / attribute extraction
 SEASON_TAGS = ("spring", "summer", "fall", "winter", "all")

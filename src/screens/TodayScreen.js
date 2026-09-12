@@ -7,7 +7,7 @@ import { C, F } from '../theme/theme';
 
 const PRIORITY_COLOR = { high: '#BC9670', medium: C.dim, low: C.faint };
 
-export default function TodayScreen({ outfits, index, worn, onSkip, onWear, onAdd, stats, engineStatus, engineError, suggestions }) {
+export default function TodayScreen({ outfits, index, worn, onSkip, onWear, onAdd, stats, engineStatus, engineError, suggestions, suggestionsLoading }) {
   const insets = useSafeAreaInsets();
   const outfit = outfits.length ? outfits[index % outfits.length] : null;
 
@@ -108,7 +108,20 @@ export default function TodayScreen({ outfits, index, worn, onSkip, onWear, onAd
           </View>
 
           {/* Optimize Closet — wardrobe gap suggestions */}
-          {suggestions && suggestions.length > 0 && (
+          {suggestionsLoading && (!suggestions || !suggestions.length) ? (
+            <View style={styles.suggestSection}>
+              <View style={styles.suggestHeader}>
+                <Display size={20}>Optimize your closet</Display>
+                <Mono size={10.5} color={C.ember}>AI suggestions</Mono>
+              </View>
+              <View style={styles.suggestCard}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <ActivityIndicator size="small" color={C.ember} />
+                  <Body size={13.5} color={C.dim}>Analyzing wardrobe gaps…</Body>
+                </View>
+              </View>
+            </View>
+          ) : suggestions && suggestions.length > 0 ? (
             <View style={styles.suggestSection}>
               <View style={styles.suggestHeader}>
                 <Display size={20}>Optimize your closet</Display>
@@ -131,7 +144,7 @@ export default function TodayScreen({ outfits, index, worn, onSkip, onWear, onAd
                 </View>
               ))}
             </View>
-          )}
+          ) : null}
         </>
       )}
     </ScrollView>
