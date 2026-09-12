@@ -32,6 +32,14 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
+
+# Python engine
+services/outfit-creator/.venv/
+services/outfit-creator/__pycache__/
+services/outfit-creator/.pytest_cache/
+services/outfit-creator/.env
+services/outfit-creator/scripts/last_*.json
 
 # typescript
 *.tsbuildinfo

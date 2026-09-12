@@ -15,6 +15,7 @@
 import { loadPixels } from './imaging';
 import { dominantColour } from './colour';
 import { classify } from './classifier';
+import { describeGarment } from './describeGarment';
 import { TYPES } from '../theme/theme';
 
 /* Display names read better than the bare category. */
@@ -64,5 +65,7 @@ export async function tagGarment(photoUri) {
     /* No model bundled yet, or inference failed — manual category it is. */
   }
 
+  item.id = item.id || String(Date.now());
+  item.description = describeGarment(item);
   return item;
 }

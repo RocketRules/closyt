@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, ScrollView, Pressable, Text, Image, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, Display, Mono, Body, PrimaryButton, Hatch } from '../components/ui';
+import { describeGarment } from '../logic/describeGarment';
 import { C, F, TYPES, COLORS, FITS, swatchFor } from '../theme/theme';
 
 export default function ItemDetailSheet({ item, onClose, onSave, onDelete }) {
@@ -65,7 +66,11 @@ export default function ItemDetailSheet({ item, onClose, onSave, onDelete }) {
 
         <PrimaryButton
           label="Save tags"
-          onPress={() => onSave({ ...draft, needsReview: false })}
+          onPress={() => {
+            const saved = { ...draft, needsReview: false };
+            saved.description = describeGarment(saved);
+            onSave(saved);
+          }}
           style={{ marginTop: 6 }}
         />
         <Pressable onPress={() => onDelete(draft.id)} style={styles.remove}>

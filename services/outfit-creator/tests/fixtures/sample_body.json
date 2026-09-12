@@ -1,0 +1,9 @@
+{
+  "height_cm": 175.0,
+  "weight_kg": 72.0,
+  "age": 22,
+  "gender": "m",
+  "fit_preference": "looser",
+  "sleeve_preference": "long",
+  "color_preference": "darker"
+}

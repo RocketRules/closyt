@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+scripts/last_deterministic_run.json
+scripts/last_live_ifm_run.json
+.DS_Store
+*.egg-info/
+dist/
+build/

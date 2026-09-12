@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Display, Mono, Body, PrimaryButton, GhostButton } from '../components/ui';
 import ItemThumb from '../components/ItemThumb';
 import { C } from '../theme/theme';
 
-export default function TodayScreen({ outfits, index, worn, onSkip, onWear, onAdd, stats }) {
+export default function TodayScreen({ outfits, index, worn, onSkip, onWear, onAdd, stats, engineStatus, engineError }) {
   const insets = useSafeAreaInsets();
   const outfit = outfits.length ? outfits[index % outfits.length] : null;
 
@@ -14,11 +14,37 @@ export default function TodayScreen({ outfits, index, worn, onSkip, onWear, onAd
       <View style={styles.header}>
         <Display size={30}>Today</Display>
         <Mono size={10.5}>
-          {stats.total ? `${stats.inRotation}/${stats.total} in rotation` : 'empty closet'}
+          {engineStatus === 'loading'
+            ? 'Ranking outfits…'
+            : stats.total
+              ? `${stats.inRotation}/${stats.total} in rotation`
+              : 'empty closet'}
         </Mono>
       </View>
 
-      {!outfit ? (
+      {engineStatus === 'loading' && !outfit ? (
+        <View style={styles.empty}>
+          <ActivityIndicator size="large" color={C.ember} />
+          <Body size={14.5} style={{ textAlign: 'center', maxWidth: 260, marginTop: 12 }}>
+            The fit engine is scoring your wardrobe…
+          </Body>
+        </View>
+      ) : engineStatus === 'error' ? (
+        <View style={styles.empty}>
+          <Display size={22} style={{ textAlign: 'center', maxWidth: 260 }}>
+            Fit engine offline
+          </Display>
+          <Body size={13.5} style={{ textAlign: 'center', maxWidth: 280, marginTop: 6 }}>
+            {engineError || 'Could not reach the scoring service. Make sure it is running on your laptop.'}
+          </Body>
+          <PrimaryButton
+            label="Add items to your Closet"
+            onPress={onAdd}
+            height={58}
+            style={{ marginTop: 18, paddingHorizontal: 28 }}
+          />
+        </View>
+      ) : !outfit ? (
         <View style={styles.empty}>
           <View style={styles.placeholderGrid}>
             {[0, 1, 2, 3].map((n) => (

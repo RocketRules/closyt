@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,12 +18,31 @@ import ItemDetailSheet from './src/screens/ItemDetailSheet';
 import AddItemSheet from './src/screens/AddItemSheet';
 import TabBar from './src/components/TabBar';
 import { Screen } from './src/components/ui';
-import { recommendOutfits, wardrobeStats } from './src/logic/recommend';
+import { wardrobeStats } from './src/logic/recommend';
 import { preloadClassifier } from './src/logic/classifier';
+import { mergeBodyProfile } from './src/logic/bodyProfile';
+import { buildRankRequest } from './src/logic/mapToFitEngine';
+import { rankOutfits } from './src/logic/fitEngineClient';
 import * as store from './src/storage/store';
 import { C } from './src/theme/theme';
 
 const DEFAULT_DRAFT = { gender: 'Woman', age: 29, height: 168, weight: 62, hUnit: 'cm', wUnit: 'kg' };
+
+const OUTFIT_NAMES = ['Easy Tuesday', 'Quiet Sharp', 'Layered Walk', 'Soft Structure', 'Low Effort', 'Long Line', 'Warm Neutral', 'Off Duty'];
+
+function mapEngineOutfits(response, items) {
+  if (!response?.outfits?.length) return [];
+  const byId = {};
+  items.forEach((it) => { byId[it.id] = it; });
+  return response.outfits.map((o, i) => ({
+    pieces: o.item_ids.map((id) => byId[id]).filter(Boolean),
+    score: o.final_score,
+    match: `${Math.min(99, Math.round(o.final_score * 10))}% you`,
+    why: o.rationale || '',
+    name: OUTFIT_NAMES[i % OUTFIT_NAMES.length],
+    key: o.item_ids.sort().join('-'),
+  }));
+}
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -45,10 +64,13 @@ export default function App() {
   const [detail, setDetail] = useState(null);
   const [adding, setAdding] = useState(false);
   const [addedThisSession, setAddedThisSession] = useState(0);
+  const [outfits, setOutfits] = useState([]);
+  const [engineStatus, setEngineStatus] = useState('idle'); // idle | loading | ok | error
+  const [engineError, setEngineError] = useState(null);
+  const rankTimer = useRef(null);
 
   /* Restore the closet on launch; returning users skip straight past onboarding. */
   useEffect(() => {
-    /* Warm the classifier now so the first garment photo is not the slow one. */
     preloadClassifier();
     (async () => {
       const [saved, wardrobe, counts] = await Promise.all([
@@ -73,15 +95,43 @@ export default function App() {
     store.saveWardrobe(next);
   }, []);
 
-  /* Recompute the ranked outfits whenever the closet or the profile changes. */
-  const outfits = useMemo(
-    () => recommendOutfits(items, profile, wornCounts),
-    [items, profile, wornCounts]
-  );
-  const stats = useMemo(() => wardrobeStats(items, outfits), [items, outfits]);
+  /* Call the fit-scoring engine whenever the wardrobe or profile changes (debounced). */
+  useEffect(() => {
+    if (!profile || !items.length) {
+      setOutfits([]);
+      setEngineStatus('idle');
+      return;
+    }
+    if (rankTimer.current) clearTimeout(rankTimer.current);
+    rankTimer.current = setTimeout(async () => {
+      setEngineStatus('loading');
+      setEngineError(null);
+      try {
+        const req = buildRankRequest(items, profile);
+        const resp = await rankOutfits(req);
+        const mapped = mapEngineOutfits(resp, items);
+        setOutfits(mapped);
+        setEngineStatus('ok');
+      } catch (err) {
+        console.warn('Fit engine error:', err.message);
+        setEngineError(err.message);
+        setOutfits([]);
+        setEngineStatus('error');
+      }
+    }, 400);
+    return () => { if (rankTimer.current) clearTimeout(rankTimer.current); };
+  }, [items, profile]);
+
+  const stats = { total: items.length, inRotation: 0, combinations: outfits.length };
+  if (outfits.length) {
+    const used = new Set();
+    outfits.forEach((o) => o.pieces.forEach((p) => used.add(p.id)));
+    stats.inRotation = used.size;
+  }
 
   const finishOnboarding = (photos) => {
-    const next = { ...profileDraft, photos };
+    const merged = mergeBodyProfile(profileDraft);
+    const next = { ...profileDraft, ...merged, photos };
     setProfile(next);
     store.saveBodyProfile(next);
     setScreen('ready');
@@ -215,6 +265,8 @@ function MainApp({
             index={outfitIndex}
             worn={worn}
             stats={stats}
+            engineStatus={engineStatus}
+            engineError={engineError}
             onSkip={onSkipOutfit}
             onWear={onWearOutfit}
             onAdd={onAdd}

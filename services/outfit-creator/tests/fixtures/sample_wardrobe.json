@@ -1,0 +1,260 @@
+{
+  "items": [
+    {
+      "id": "shirt_navy_oxford",
+      "category": "shirt",
+      "description": "navy oxford button-down shirt",
+      "attributes": {
+        "primary_color": "navy",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 4,
+        "season_tags": ["all"],
+        "layer_type": "base",
+        "fit_hint": "tighter",
+        "sleeve_hint": "long",
+        "color_depth": "darker"
+      }
+    },
+    {
+      "id": "shirt_neon_graphic",
+      "category": "shirt",
+      "description": "neon orange graphic tee",
+      "attributes": {
+        "primary_color": "orange",
+        "secondary_color": "yellow",
+        "pattern": "graphic",
+        "formality_tier": 1,
+        "season_tags": ["summer"],
+        "layer_type": "base",
+        "fit_hint": "looser",
+        "sleeve_hint": "short",
+        "color_depth": "lighter"
+      }
+    },
+    {
+      "id": "shirt_white_tee",
+      "category": "shirt",
+      "description": "plain white cotton tee",
+      "attributes": {
+        "primary_color": "white",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 2,
+        "season_tags": ["spring", "summer", "all"],
+        "layer_type": "base",
+        "fit_hint": "looser",
+        "sleeve_hint": "short",
+        "color_depth": "lighter"
+      }
+    },
+    {
+      "id": "pant_charcoal_wool",
+      "category": "pant",
+      "description": "charcoal wool dress pants",
+      "attributes": {
+        "primary_color": "gray",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 5,
+        "season_tags": ["fall", "winter"],
+        "layer_type": "base",
+        "fit_hint": "tighter",
+        "sleeve_hint": null,
+        "color_depth": "darker"
+      }
+    },
+    {
+      "id": "pant_indigo_jeans",
+      "category": "pant",
+      "description": "indigo slim denim jeans",
+      "attributes": {
+        "primary_color": "denim",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 2,
+        "season_tags": ["all"],
+        "layer_type": "base",
+        "fit_hint": "tighter",
+        "sleeve_hint": null,
+        "color_depth": "darker"
+      }
+    },
+    {
+      "id": "short_khaki_chino",
+      "category": "short",
+      "description": "khaki chino casual shorts",
+      "attributes": {
+        "primary_color": "khaki",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 2,
+        "season_tags": ["summer"],
+        "layer_type": "base",
+        "fit_hint": "looser",
+        "sleeve_hint": null,
+        "color_depth": "lighter"
+      }
+    },
+    {
+      "id": "shoe_leather_derby",
+      "category": "shoe",
+      "description": "black leather derby shoes",
+      "attributes": {
+        "primary_color": "black",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 5,
+        "season_tags": ["all"],
+        "layer_type": "footwear",
+        "fit_hint": null,
+        "sleeve_hint": null,
+        "color_depth": "darker"
+      }
+    },
+    {
+      "id": "shoe_white_sneaker",
+      "category": "shoe",
+      "description": "white canvas low sneakers",
+      "attributes": {
+        "primary_color": "white",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 1,
+        "season_tags": ["spring", "summer", "all"],
+        "layer_type": "footwear",
+        "fit_hint": "looser",
+        "sleeve_hint": null,
+        "color_depth": "lighter"
+      }
+    },
+    {
+      "id": "sock_black_dress",
+      "category": "sock",
+      "description": "black mid-calf dress socks",
+      "attributes": {
+        "primary_color": "black",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 4,
+        "season_tags": ["all"],
+        "layer_type": "accessory",
+        "fit_hint": null,
+        "sleeve_hint": null,
+        "color_depth": "darker"
+      }
+    },
+    {
+      "id": "sock_white_athletic",
+      "category": "sock",
+      "description": "white athletic crew socks",
+      "attributes": {
+        "primary_color": "white",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 1,
+        "season_tags": ["all"],
+        "layer_type": "accessory",
+        "fit_hint": null,
+        "sleeve_hint": null,
+        "color_depth": "lighter"
+      }
+    },
+    {
+      "id": "sweater_cream_crew",
+      "category": "sweater",
+      "description": "cream wool crew sweater",
+      "attributes": {
+        "primary_color": "cream",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 3,
+        "season_tags": ["fall", "winter"],
+        "layer_type": "mid",
+        "fit_hint": "looser",
+        "sleeve_hint": "long",
+        "color_depth": "lighter"
+      }
+    },
+    {
+      "id": "jacket_navy_blazer",
+      "category": "jacket",
+      "description": "navy structured blazer jacket",
+      "attributes": {
+        "primary_color": "navy",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 5,
+        "season_tags": ["fall", "spring", "all"],
+        "layer_type": "outer",
+        "fit_hint": "tighter",
+        "sleeve_hint": "long",
+        "color_depth": "darker"
+      }
+    },
+    {
+      "id": "outerwear_olive_parka",
+      "category": "outerwear",
+      "description": "olive hooded winter parka",
+      "attributes": {
+        "primary_color": "olive",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 2,
+        "season_tags": ["winter"],
+        "layer_type": "outer",
+        "fit_hint": "looser",
+        "sleeve_hint": "long",
+        "color_depth": "darker"
+      }
+    },
+    {
+      "id": "underwear_black_boxer",
+      "category": "underwear",
+      "description": "black cotton boxer briefs",
+      "attributes": {
+        "primary_color": "black",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 1,
+        "season_tags": ["all"],
+        "layer_type": "underwear",
+        "fit_hint": null,
+        "sleeve_hint": null,
+        "color_depth": "darker"
+      }
+    },
+    {
+      "id": "dress_burgundy_midi",
+      "category": "dress",
+      "description": "burgundy midi day dress",
+      "attributes": {
+        "primary_color": "burgundy",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 3,
+        "season_tags": ["fall", "spring"],
+        "layer_type": "onepiece",
+        "fit_hint": "tighter",
+        "sleeve_hint": "short",
+        "color_depth": "darker"
+      }
+    },
+    {
+      "id": "onepiece_denim_jumpsuit",
+      "category": "onepiece",
+      "description": "denim utility jumpsuit",
+      "attributes": {
+        "primary_color": "denim",
+        "secondary_color": null,
+        "pattern": "solid",
+        "formality_tier": 2,
+        "season_tags": ["spring", "summer"],
+        "layer_type": "onepiece",
+        "fit_hint": "looser",
+        "sleeve_hint": "short",
+        "color_depth": "darker"
+      }
+    }
+  ]
+}
